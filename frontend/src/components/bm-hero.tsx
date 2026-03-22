@@ -17,8 +17,13 @@ export function BmHero({ onAnalyze, loading, preset }: BmHeroProps) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => setWordIdx((i) => (i + 1) % WORDS.length), 2400);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    intervalRef.current = setInterval(
+      () => setWordIdx((i) => (i + 1) % WORDS.length),
+      2400
+    );
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -29,57 +34,62 @@ export function BmHero({ onAnalyze, loading, preset }: BmHeroProps) {
     onAnalyze(t);
   };
 
-  const scrollAnalyze = () => document.getElementById("analyze")?.scrollIntoView({ behavior: "smooth" });
-
   return (
     <header
       id="hero"
-      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden"
       style={{ background: "#0B0C10" }}
     >
-      {/* Background grid */}
+      {/* Subtle grid */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage: `linear-gradient(rgba(204,255,0,0.5) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(204,255,0,0.5) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
+          backgroundSize: "80px 80px",
         }}
       />
 
-      {/* Corner accents */}
-      <div className="pointer-events-none absolute top-0 left-0 w-32 h-32"
-        style={{ borderRight: "1px solid rgba(204,255,0,0.2)", borderBottom: "1px solid rgba(204,255,0,0.2)" }} />
-      <div className="pointer-events-none absolute bottom-0 right-0 w-32 h-32"
-        style={{ borderLeft: "1px solid rgba(204,255,0,0.2)", borderTop: "1px solid rgba(204,255,0,0.2)" }} />
-
-      {/* Character — floating right side */}
+      {/* Character — right side */}
       <div
         className="pointer-events-none select-none absolute right-0 bottom-0 hidden lg:block animate-float"
-        style={{ width: "clamp(200px, 28vw, 420px)", zIndex: 2 }}
+        style={{ width: "clamp(180px, 22vw, 360px)", zIndex: 2, opacity: 0.85 }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/creatures/cyberdj.png" alt=""
+        <img
+          src="/creatures/cyberdj.png"
+          alt=""
           style={{
-            width: "100%", objectFit: "contain", objectPosition: "bottom",
-            filter: "drop-shadow(0 0 40px rgba(204,255,0,0.35)) brightness(1.1)",
+            width: "100%",
+            objectFit: "contain",
+            objectPosition: "bottom",
+            filter: "drop-shadow(0 0 30px rgba(204,255,0,0.2))",
           }}
         />
       </div>
 
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col items-start px-8 md:px-16 lg:px-24 w-full max-w-7xl pt-32 pb-20">
+      {/* Content */}
+      <div className="relative z-10 px-8 md:px-16 lg:px-24 w-full max-w-6xl pt-28 pb-24">
         {/* Eyebrow */}
-        <div className="mb-6 flex items-center gap-3">
-          <div className="h-px w-12" style={{ background: "#CCFF00" }} />
-          <span className="font-body font-bold uppercase tracking-[0.3em] text-xs" style={{ color: "#CCFF00" }}>
+        <div className="mb-8 flex items-center gap-3">
+          <div className="h-px w-10" style={{ background: "#CCFF00" }} />
+          <span
+            className="font-body font-bold uppercase tracking-[0.25em] text-xs"
+            style={{ color: "#CCFF00" }}
+          >
             AI MUSIC INTELLIGENCE
           </span>
         </div>
 
-        {/* Massive headline */}
-        <h1 className="font-display text-white text-shadow-brutal leading-none uppercase select-none"
-          style={{ fontSize: "clamp(3.5rem, 11vw, 10rem)", letterSpacing: "-0.02em", maxWidth: "14ch" }}>
+        {/* Headline */}
+        <h1
+          className="font-display text-white leading-none uppercase"
+          style={{
+            fontSize: "clamp(3rem, 9vw, 8rem)",
+            letterSpacing: "-0.02em",
+            maxWidth: "15ch",
+          }}
+        >
           FIND THE{" "}
           <span
             className="font-display"
@@ -87,7 +97,7 @@ export function BmHero({ onAnalyze, loading, preset }: BmHeroProps) {
               color: "#CCFF00",
               display: "inline-block",
               minWidth: "6ch",
-              transition: "opacity 0.25s",
+              transition: "opacity 0.3s",
             }}
           >
             {WORDS[wordIdx]}
@@ -95,69 +105,126 @@ export function BmHero({ onAnalyze, loading, preset }: BmHeroProps) {
           OF ANY SONG.
         </h1>
 
-        {/* Subtext */}
-        <p className="font-body text-lg mt-6 mb-10 max-w-xl"
-          style={{ color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
+        {/* Sub */}
+        <p
+          className="font-body mt-5 mb-10 max-w-lg"
+          style={{ color: "rgba(255,255,255,0.38)", lineHeight: 1.7, fontSize: 16 }}
+        >
           Paste a YouTube or SoundCloud link. Pick your edit type.
           Get exact timestamps, best cuts, and a shot-by-shot plan.
         </p>
 
-        {/* Input + CTA */}
-        <form onSubmit={handleSubmit} className="w-full max-w-2xl flex flex-col sm:flex-row gap-3">
+        {/* Input row */}
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col sm:flex-row gap-3 w-full max-w-xl"
+        >
           <input
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="PASTE A YOUTUBE OR SOUNDCLOUD LINK…"
+            placeholder="Paste a YouTube or SoundCloud link…"
             disabled={loading}
-            className="brutal-input font-body flex-1 px-5 py-4 text-sm uppercase tracking-wider"
+            className="brutal-input flex-1 px-5 py-4 text-sm"
+            style={{ fontSize: 14 }}
           />
           <button
             type="submit"
             disabled={loading || !url.trim()}
-            className="font-display text-xl px-8 py-4 uppercase tracking-wider transition-all disabled:opacity-40"
-            style={{ background: "#CCFF00", color: "#000", letterSpacing: "0.05em" }}
-            onMouseEnter={(e) => !loading && (e.currentTarget.style.background = "#fff")}
-            onMouseLeave={(e) => !loading && (e.currentTarget.style.background = "#CCFF00")}
+            className="font-display uppercase px-7 py-4 transition-all disabled:opacity-40 shrink-0"
+            style={{
+              background: "#CCFF00",
+              color: "#000",
+              fontSize: 18,
+              letterSpacing: "0.04em",
+            }}
+            onMouseEnter={(e) =>
+              !loading && (e.currentTarget.style.background = "rgba(204,255,0,0.8)")
+            }
+            onMouseLeave={(e) =>
+              !loading && (e.currentTarget.style.background = "#CCFF00")
+            }
           >
             {loading ? "ANALYSING…" : "ANALYSE →"}
           </button>
         </form>
 
-        {/* Quick nav links */}
-        <div className="mt-8 flex flex-wrap gap-6">
-          <button onClick={scrollAnalyze}
-            className="font-body text-xs font-bold uppercase tracking-widest transition-colors"
-            style={{ color: "rgba(255,255,255,0.3)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#CCFF00")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
-          >
-            COMPARE SONGS →
-          </button>
-          <button onClick={() => document.getElementById("trending")?.scrollIntoView({ behavior: "smooth" })}
-            className="font-body text-xs font-bold uppercase tracking-widest transition-colors"
-            style={{ color: "rgba(255,255,255,0.3)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#CCFF00")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
-          >
-            EXPLORE TRENDING →
-          </button>
-        </div>
+        {/* Scroll hint */}
+        <p
+          className="font-body text-xs mt-8 uppercase tracking-widest"
+          style={{ color: "rgba(255,255,255,0.2)" }}
+        >
+          Scroll to explore trending tracks ↓
+        </p>
       </div>
 
-      {/* Bottom marquee teaser */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden"
-        style={{ background: "#CCFF00", height: 44 }}>
+      {/* Slim marquee strip */}
+      <div
+        className="absolute bottom-0 left-0 right-0 overflow-hidden"
+        style={{
+          background: "rgba(204,255,0,0.08)",
+          borderTop: "1px solid rgba(204,255,0,0.15)",
+          height: 36,
+        }}
+      >
         <div className="marquee-track flex items-center h-full">
-          {[...Array(8)].flatMap((_, i) => [
-            <span key={`a${i}`} className="font-display text-black text-lg mx-6 uppercase">BEST CUTS</span>,
-            <span key={`b${i}`} className="font-display text-black text-lg mx-6 uppercase">·</span>,
-            <span key={`c${i}`} className="font-display text-black text-lg mx-6 uppercase">SHOT PLAN</span>,
-            <span key={`d${i}`} className="font-display text-black text-lg mx-6 uppercase">·</span>,
-            <span key={`e${i}`} className="font-display text-black text-lg mx-6 uppercase">TALK-OVER ZONES</span>,
-            <span key={`f${i}`} className="font-display text-black text-lg mx-6 uppercase">·</span>,
-            <span key={`g${i}`} className="font-display text-black text-lg mx-6 uppercase">HOOK DETECTION</span>,
-            <span key={`h${i}`} className="font-display text-black text-lg mx-6 uppercase">·</span>,
+          {[...Array(12)].flatMap((_, i) => [
+            <span
+              key={`a${i}`}
+              className="font-body font-bold text-xs mx-5 uppercase tracking-widest"
+              style={{ color: "#CCFF00" }}
+            >
+              BEST CUTS
+            </span>,
+            <span
+              key={`b${i}`}
+              className="mx-3 text-xs"
+              style={{ color: "rgba(204,255,0,0.3)" }}
+            >
+              ·
+            </span>,
+            <span
+              key={`c${i}`}
+              className="font-body font-bold text-xs mx-5 uppercase tracking-widest"
+              style={{ color: "#CCFF00" }}
+            >
+              SHOT PLAN
+            </span>,
+            <span
+              key={`d${i}`}
+              className="mx-3 text-xs"
+              style={{ color: "rgba(204,255,0,0.3)" }}
+            >
+              ·
+            </span>,
+            <span
+              key={`e${i}`}
+              className="font-body font-bold text-xs mx-5 uppercase tracking-widest"
+              style={{ color: "#CCFF00" }}
+            >
+              HOOK DETECTION
+            </span>,
+            <span
+              key={`f${i}`}
+              className="mx-3 text-xs"
+              style={{ color: "rgba(204,255,0,0.3)" }}
+            >
+              ·
+            </span>,
+            <span
+              key={`g${i}`}
+              className="font-body font-bold text-xs mx-5 uppercase tracking-widest"
+              style={{ color: "#CCFF00" }}
+            >
+              TALK-OVER ZONES
+            </span>,
+            <span
+              key={`h${i}`}
+              className="mx-3 text-xs"
+              style={{ color: "rgba(204,255,0,0.3)" }}
+            >
+              ·
+            </span>,
           ])}
         </div>
       </div>

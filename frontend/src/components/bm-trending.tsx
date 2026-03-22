@@ -48,35 +48,36 @@ export function BmTrending({ preset, onAnalyze }: BmTrendingProps) {
 
   return (
     <section id="trending" ref={ref} className="relative w-full py-24 px-8 md:px-16"
-      style={{ background: "#1F2833" }}>
+      style={{ background: "#0D0E13", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
 
       {/* Heading */}
-      <div className="mb-10">
+      <div className="mb-10 max-w-3xl">
         <div className="flex items-center gap-4 mb-3">
-          <div className="h-px w-12" style={{ background: "#66FCF1" }} />
-          <span className="font-body font-bold uppercase tracking-[0.3em] text-xs" style={{ color: "#66FCF1" }}>
+          <div className="h-px w-10" style={{ background: "rgba(255,255,255,0.2)" }} />
+          <span className="font-body font-bold uppercase tracking-[0.25em] text-xs"
+            style={{ color: "rgba(255,255,255,0.35)" }}>
             🔥 LIVE CHARTS
           </span>
         </div>
         <h2 className="font-display uppercase text-white leading-none"
-          style={{ fontSize: "clamp(2rem, 7vw, 6rem)", letterSpacing: "-0.02em" }}>
-          TRENDING{" "}
-          <span style={{ color: "#CCFF00" }}>RIGHT NOW</span>
+          style={{ fontSize: "clamp(2rem, 5vw, 4rem)", letterSpacing: "-0.02em" }}>
+          TRENDING RIGHT NOW
         </h2>
         <p className="font-body mt-2" style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
-          PICK ONE AND ANALYSE IT INSTANTLY.
+          Pick one and analyse it instantly.
         </p>
       </div>
 
       {/* Language tabs */}
-      <div className="flex gap-2 flex-wrap mb-8">
+      <div className="flex gap-1.5 flex-wrap mb-8">
         {LANG_TABS.map((t) => (
           <button key={t.id} onClick={() => setLang(t.id)}
             className="font-body font-bold text-xs uppercase tracking-widest px-3 py-2 transition-all"
             style={{
-              border: `2px solid ${lang === t.id ? "#CCFF00" : "rgba(255,255,255,0.15)"}`,
-              background: lang === t.id ? "#CCFF00" : "transparent",
+              border: `1px solid ${lang === t.id ? "#CCFF00" : "rgba(255,255,255,0.1)"}`,
+              background: lang === t.id ? "#CCFF00" : "rgba(255,255,255,0.03)",
               color: lang === t.id ? "#000" : "rgba(255,255,255,0.4)",
+              borderRadius: 2,
             }}
           >
             {t.flag} {t.label}
@@ -123,9 +124,9 @@ export function BmTrending({ preset, onAnalyze }: BmTrendingProps) {
                 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
                 className="group flex items-center gap-4 p-4 cursor-default transition-all"
-                style={{ border: "2px solid rgba(255,255,255,0.07)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#CCFF00")}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
+                style={{ border: "1px solid rgba(255,255,255,0.06)", borderRadius: 4 }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(204,255,0,0.3)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(204,255,0,0.03)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.06)"; (e.currentTarget as HTMLDivElement).style.background = "transparent"; }}
               >
                 {/* Rank */}
                 <span className="font-display text-base w-7 text-center shrink-0"
