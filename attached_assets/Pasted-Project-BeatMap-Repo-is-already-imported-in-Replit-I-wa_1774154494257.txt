@@ -1,0 +1,1063 @@
+Project: BeatMap
+Repo is already imported in Replit.
+
+I want you to redesign and upgrade my homepage and core UI experience into a premium, highly animated, emotionally engaging landing page inspired by the motion quality and storytelling feel of the reference video I uploaded.
+
+IMPORTANT:
+- Do NOT copy the other site’s brand, illustrations, logo, mascot, wording, layout, or any copyrighted visual asset.
+- Instead, study the reference for:
+  - pacing
+  - motion language
+  - section transitions
+  - premium storytelling flow
+  - large rounded containers
+  - floating navigation
+  - dark-to-light visual rhythm
+  - big visual scenes
+  - playful but polished interaction design
+- Then reinterpret that style in a completely original way for MY product: BeatMap.
+
+==================================================
+WHAT BEATMAP IS
+==================================================
+
+BeatMap is not just a song analyzer.
+
+It should feel like:
+- an editor’s music copilot
+- a creator’s shortcut for choosing the best part of a song
+- a smarter way to find the best cut, best opening, best talking-over section, and best song for a video
+
+The site should immediately make sense to:
+- creators
+- influencers
+- social media managers
+- wedding/travel editors
+- students making reels
+- small businesses making ads
+- people with very low technical knowledge
+
+That means:
+- very simple wording
+- very visual explanation
+- no dense dashboards on the homepage
+- no jargon-heavy labels
+- always explain what a feature does in plain English
+
+==================================================
+CORE CREATIVE DIRECTION
+==================================================
+
+I want the UI to feel:
+- premium
+- cinematic
+- animated
+- modern
+- playful
+- clean
+- memorable
+- creator-friendly
+- highly polished
+- original to BeatMap
+
+I want users to feel:
+- “This looks expensive”
+- “This feels alive”
+- “I understand what it does immediately”
+- “This will save me time”
+- “I want to click around”
+
+The emotional tone should be:
+- creative-tech
+- music-forward
+- visually rich
+- friendly, not cold
+- premium, not corporate
+- energetic, but not chaotic
+
+==================================================
+PRIMARY GOAL OF THE REDESIGN
+==================================================
+
+Turn the homepage from “feature page / app entry” into a full premium product experience that:
+1. creates immediate visual wow
+2. explains the product simply
+3. shows usefulness fast
+4. makes trending songs actionable
+5. makes analysis feel practical, not abstract
+6. feels understandable to non-technical users
+7. encourages users to paste a song link and try it
+
+==================================================
+BIG PICTURE INFORMATION ARCHITECTURE
+==================================================
+
+Rebuild the homepage into this flow:
+
+1. Floating top navigation
+2. Cinematic hero with rotating BeatMap visual worlds
+3. Simple product intro / big positioning section
+4. “What are you making?” preset selector
+5. Trending now section
+6. Live BeatMap result preview / interactive analysis showcase
+7. “Why people use BeatMap” value section
+8. Best cuts + talk-over + shot plan visual section
+9. Compare tracks section
+10. Recent analyses / saved work section
+11. Final CTA banner
+12. Premium footer
+
+This must feel like one highly choreographed experience.
+
+==================================================
+OVERALL DESIGN SYSTEM
+==================================================
+
+Build or refine a consistent design system with:
+- extra-large rounded corners
+- glassmorphism for nav / overlay elements
+- strong dark hero areas
+- clean bright white or light sections after dark sections
+- rich gradients
+- soft shadows
+- layered cards
+- premium spacing
+- bold typography
+- color-coded helpful UI
+- animated pills/tags/buttons
+
+Use:
+- large section padding
+- lots of breathing room
+- big typography
+- generous whitespace
+- strong contrast between immersive sections and simple explanatory sections
+
+Avoid:
+- cramped layouts
+- plain template-like SaaS blocks
+- overuse of tiny icons
+- too much text
+- technical terms without explanation
+- static-feeling layout
+- overly busy color explosion
+
+==================================================
+COLOR DIRECTION
+==================================================
+
+Create an original BeatMap palette that feels like music + editing + creativity.
+
+Primary direction:
+- deep navy / midnight / almost-black hero backgrounds
+- violet / purple / electric blue / cyan / soft magenta accents
+- mint / lime only as tiny highlight colors
+- soft white / off-white content sections
+- glass + glow accents
+- subtle neon, not tacky neon
+
+Think:
+- music energy
+- waveform glow
+- cinematic editing interface
+- night studio + creative sparks
+
+Color usage ideas:
+- hero background: deep blue-black gradients with layered glow
+- CTA buttons: luminous gradient pills
+- cards: translucent dark or clean white depending on section
+- status tags: mint / cyan / violet / soft coral
+- dividers: extremely subtle
+
+==================================================
+TYPOGRAPHY
+==================================================
+
+Use typography that feels:
+- modern
+- bold
+- simple
+- friendly
+- clear
+- premium
+
+Hierarchy should be very obvious.
+
+Examples of tone:
+- Big, punchy headings
+- Short supporting paragraphs
+- Tiny helper copy where needed
+- Avoid paragraphs that are too long
+
+Headings should feel like:
+- strong
+- direct
+- creator-friendly
+- useful
+
+Examples of homepage tone:
+- “Find the best part of any song for your video.”
+- “Stop guessing where your edit should start.”
+- “Pick a song. Choose what you’re making. Get the best cut.”
+- “Know where to talk over the music.”
+- “Compare songs before you edit.”
+
+==================================================
+NON-TECHNICAL LANGUAGE RULE
+==================================================
+
+Extremely important:
+Everything should be understandable to someone who has never heard terms like:
+- metadata
+- hook window
+- inference
+- confidence
+- scene fit
+- analysis mode
+
+Translate technical ideas into plain English.
+
+Use labels like:
+- “Best opening moment”
+- “Best part for a 15-second reel”
+- “Best parts to talk over”
+- “Good for travel videos”
+- “Good for product videos”
+- “Try similar tracks”
+- “How to cut your video to this song”
+
+If technical labels exist internally, keep them secondary or hidden.
+
+==================================================
+SECTION 1 — FLOATING TOP NAVIGATION
+==================================================
+
+I want a floating nav that feels like a premium capsule sitting above the hero.
+
+Structure:
+- Left: BeatMap logo / wordmark
+- Center: nav links
+- Right: utility icons or simple actions + primary CTA
+
+Suggested nav links:
+- Home
+- Trending
+- Analyze
+- Compare
+- Library
+- About
+
+Suggested CTA:
+- Try BeatMap
+or
+- Analyze a Song
+
+Visual style:
+- translucent pill-shaped container
+- blurred background
+- subtle border
+- soft shadow
+- floating with margin from top
+- rounded full-pill corners
+- elegant and lightweight
+
+Behavior:
+- fades/slides in on page load
+- remains sticky while scrolling
+- slightly shrinks or tightens padding on scroll
+- nav links have elegant hover underline / glow / lift effect
+- CTA button should feel energetic and premium
+
+Microinteractions:
+- nav hover should feel soft and smooth
+- CTA hover should slightly lift and glow
+- icons can gently rotate/scale on hover
+
+Animation guidance:
+- initial enter: opacity 0 to 1, y from -18px to 0
+- duration around 0.6s
+- smooth easing
+- sticky state transition should be subtle and premium
+
+On mobile:
+- collapse elegantly
+- preserve premium floating style
+- do not fall back to ugly plain header
+
+==================================================
+SECTION 2 — HERO: “CINEMATIC BEATMAP WORLDS”
+==================================================
+
+This is the centerpiece.
+
+I want a giant rounded hero container that feels immersive, animated, and story-driven like the reference video.
+
+Concept:
+Instead of random decorative blobs, create “BeatMap worlds” or “music worlds” that rotate automatically in the hero.
+Each scene should feel like a different creative mood or editing use case.
+
+Examples of BeatMap hero scenes:
+1. Trending City Lights
+   - floating track cards over a glowing world/city map
+   - songs pulsing in different regions
+   - animated beats/ribbons moving across the map
+   - represents “trending songs around the world”
+
+2. Creator Studio
+   - stylized editing timeline elements
+   - floating music panels
+   - glowing timestamps
+   - visual cues for best cuts / talking sections / presets
+   - represents “editing guidance”
+
+3. Short-Form Energy
+   - vertical-video inspired composition
+   - animated cards for reels, shorts, TikTok
+   - motion bursts and attention-grabbing beat highlights
+   - represents “find the strongest opening fast”
+
+4. Storytelling Mood Arc
+   - softer, cinematic gradients
+   - layered scenes showing buildup, emotion, payoff
+   - floating segment markers and visual rhythm curves
+   - represents “shot plans and emotional pacing”
+
+5. Compare & Choose
+   - side-by-side song worlds
+   - animated score/indicator ribbons
+   - one track rising as “best for your edit”
+   - represents “comparison workflow”
+
+The hero should automatically rotate between 3 to 5 scenes.
+
+Hero layout:
+- huge rounded container
+- visual scene fills most of the hero
+- text sits clearly in foreground, likely left-aligned or lower-left
+- top portion can include a few helper pills like:
+  - Trending now
+  - Best cuts
+  - Compare songs
+  - Find talk-over sections
+
+Hero copy:
+Main heading examples:
+- “Find the best part of any song for your video.”
+- “Turn a song into an edit plan.”
+- “Pick a track. Find the best cut. Edit faster.”
+- “BeatMap helps creators choose and use music faster.”
+
+Support paragraph:
+Explain in one small simple paragraph:
+- paste a song link
+- choose what you’re making
+- BeatMap helps you find the best section, the best talking-over moments, and the best creative use
+
+Hero CTA group:
+- Primary: Analyze a Song
+- Secondary: Explore Trending Tracks
+- Optional tertiary text action: Compare 2 Songs
+
+Optional mini input inside hero:
+- “Paste a YouTube or SoundCloud link”
+- simple friendly field
+- stylish large pill input
+- can optionally submit directly
+
+Hero motion requirements:
+A. Scene rotation
+- automatic every 5 to 7 seconds
+- smooth crossfade
+- slight zoom/pan between scenes
+- layered foreground/background parallax
+- subtle depth illusion
+
+B. Scene life
+- floating motion on cards and glow elements
+- animated particles or tiny sound sparks
+- soft pulsing on important highlights
+- slow drifting gradients
+- subtle moving ribbons / waveform trails
+- never too noisy
+
+C. Text entrance
+- heading enters first
+- paragraph second
+- buttons third
+- pills/helper tags can stagger in
+
+D. Hover interaction
+- buttons respond beautifully
+- maybe slight reactive tilt or mouse parallax in hero visuals, but keep it tasteful
+
+E. Performance
+- keep it smooth
+- prioritize transform/opacity
+- avoid animation overload or jank
+
+Accessibility:
+- hero text must remain readable over visuals
+- overlays / gradients should support contrast
+- support reduced motion mode
+
+==================================================
+SECTION 3 — BIG INTRO / POSITIONING SECTION
+==================================================
+
+After the hero, transition into a clean light section with a huge bold statement and a large original illustration or visual collage.
+
+Purpose:
+Explain BeatMap simply and emotionally.
+
+Possible heading options:
+- “Built for people who waste too much time choosing the right part of a song.”
+- “Music should help your edit, not slow it down.”
+- “BeatMap tells you what part of the song to use.”
+
+Supporting text:
+Simple, friendly, helpful.
+Explain that BeatMap helps users:
+- choose songs faster
+- find the best opening
+- know where they can talk over music
+- compare tracks for different video types
+
+Visual:
+Create a large original BeatMap illustration / composition:
+- floating song cards
+- creator panels
+- timeline snippets
+- talking-over indicators
+- best cut markers
+- simple playful music-driven visual motifs
+- should feel premium, not cartoonish
+
+Layout:
+- left: text + CTA
+- right: visual
+or reversed if visually stronger
+
+Motion:
+- section reveals on scroll
+- text and image animate in with stagger
+- illustration can float slightly
+- maybe gentle parallax on sub-elements
+
+CTA:
+- “Try it with a song”
+or
+- “See how it works”
+
+==================================================
+SECTION 4 — “WHAT ARE YOU MAKING?”
+==================================================
+
+This section must be extremely clear, visual, and beginner-friendly.
+
+Purpose:
+Help users choose their goal before or during analysis.
+
+Heading:
+- “What are you making?”
+Subheading:
+- “Choose your type of video so BeatMap can suggest the best part of the song.”
+
+Preset options:
+- Instagram Reel
+- TikTok / Short video
+- Product ad
+- Travel montage
+- Emotional story
+- Wedding / memories
+- Gym / hype edit
+- YouTube intro
+- Podcast intro
+- Vlog
+- Gaming montage
+- Documentary / cinematic
+- Slideshow / memories
+
+Design:
+- not a plain dropdown
+- use highly polished pill cards / chips / mini tiles
+- each preset gets:
+  - an icon or mini illustration
+  - short name
+  - maybe tiny helper phrase
+- selected state should be obvious and pretty
+
+Examples of helper phrases:
+- Instagram Reel → “Fast, catchy opening”
+- Product ad → “Best reveal + talking space”
+- Travel montage → “Scenic pacing + payoff”
+- Podcast intro → “Cleaner sections for voice”
+- Wedding / memories → “Soft emotional arc”
+
+Interactions:
+- hover lift
+- selected pill glows softly
+- changes recommendation preview if connected
+- animate content updates smoothly
+
+This section should feel fun and easy.
+
+==================================================
+SECTION 5 — TRENDING NOW
+==================================================
+
+I want a premium trending section that immediately adds value.
+
+Heading:
+- “Trending now”
+Subheading:
+- “Popular songs people are using right now. Pick one and analyze it instantly.”
+
+Tabs or filters:
+- Worldwide
+- English
+- Hindi
+- Telugu
+- Tamil
+- Spanish
+- Korean
+- Japanese
+
+Each track card should include:
+- rank
+- artwork
+- song title
+- artist
+- language or region badge
+- trend status badge like New / Rising / Popular
+- Analyze button
+
+Style:
+- rounded cards
+- strong artwork presentation
+- clean typography
+- hover lift
+- image zoom on hover
+- subtle gradient hover overlay
+- playful but polished
+
+Animations:
+- section title reveals first
+- tabs animate in
+- cards stagger in
+- switching tabs animates card changes smoothly
+- Analyze button hover should feel active and inviting
+
+Important:
+Do not present the data in a boring list.
+Make it feel exciting and “clickable”.
+
+Optional enhancement:
+- one featured trending track larger than others
+- or carousel/rail layout on desktop and stacked cards on mobile
+
+==================================================
+SECTION 6 — LIVE RESULT SHOWCASE / BEATMAP PREVIEW
+==================================================
+
+I want a very polished result-preview section on the homepage that shows what BeatMap gives the user.
+
+This should feel like:
+- “Here’s what you get after analyzing a song”
+not
+- “Here is a generic app dashboard”
+
+The preview should showcase the most useful outputs in plain English.
+
+Use labels like:
+- Best opening moment
+- Best 15-second cut
+- Best parts to talk over
+- Best ways to use this song
+- Suggested shot plan
+- Similar tracks to try
+
+Layout options:
+- one large central result card with surrounding smaller cards
+- split layout with featured analysis left and modular support cards right
+- editorial-style composition
+- visually layered, premium, modern
+
+Must feel:
+- elegant
+- easy to scan
+- exciting
+- useful
+
+Include visual cues like:
+- timestamp chips
+- colored segment bars
+- talking-over labels
+- use-case tags
+- progress lines
+- mini timeline bars
+- segment badges
+
+Motion:
+- cards reveal on scroll
+- staggered animations
+- subtle timeline fill animations
+- soft hover lift
+- timestamp chips animate in sequence
+- maybe auto-rotating preview examples if tasteful
+
+Important:
+This section is not just decorative.
+It should make a user think:
+“Okay, this actually tells me what part of the song to use.”
+
+==================================================
+SECTION 7 — “WHY PEOPLE USE BEATMAP”
+==================================================
+
+This is the value proposition section.
+
+Heading:
+- “Why creators use BeatMap”
+or
+- “What BeatMap helps you do faster”
+
+Create 4 to 6 visual value cards with plain-English benefits:
+
+Examples:
+1. Find the best 15 seconds faster
+   - “Stop scrubbing through the whole song.”
+
+2. Know where to talk over the music
+   - “Find sections that may work better for narration.”
+
+3. Match songs to your video type
+   - “Choose a reel, ad, travel edit, or memory video.”
+
+4. Compare tracks before you edit
+   - “See which song is better for your exact video.”
+
+5. Use trending songs faster
+   - “Pick from trending tracks and analyze instantly.”
+
+6. Get a simple shot plan
+   - “See how your visuals can line up with the music.”
+
+Design:
+- premium cards or icon blocks
+- not too many words
+- each block very scannable
+- clear visual rhythm
+- maybe alternating dark and light cards
+
+Animation:
+- reveal with stagger
+- hover glow
+- tiny icon movement if tasteful
+
+==================================================
+SECTION 8 — BEST CUTS + TALK-OVER + SHOT PLAN STORY SECTION
+==================================================
+
+This should be one of the coolest sections on the page.
+
+Instead of showing three disconnected features, create a visual storytelling section that demonstrates workflow.
+
+Possible layout:
+A large multi-panel or split-screen section with:
+- Best cut cards on one side
+- Best parts to talk over in the middle
+- Suggested shot plan steps on the other side
+
+Or:
+a step-by-step flow:
+1. Pick best opening
+2. Find clean talking section
+3. Build your shot plan
+
+Possible heading:
+- “From song to edit plan”
+Subheading:
+- “BeatMap helps you choose the part to use, find space for voice, and build a simple structure for your video.”
+
+Show example outputs like:
+- Best 15-second cut → 00:08–00:23
+- Great for talking → 00:24–00:34
+- Shot plan:
+  - Opening hook
+  - Setup
+  - Reveal
+  - Payoff
+  - End card
+
+Motion:
+- timeline lines animate
+- cards appear in order
+- shot plan steps cascade in
+- segment indicators glow softly
+- hover states help emphasize interactivity
+
+This section should feel highly visual and highly useful.
+
+==================================================
+SECTION 9 — COMPARE TRACKS
+==================================================
+
+This section should make BeatMap feel truly practical.
+
+Heading:
+- “Compare songs before you edit”
+Subheading:
+- “Try 2 or 3 tracks and see which one works better for your video.”
+
+Design a comparison preview that is simple enough for beginners:
+- 2 or 3 side-by-side song cards
+- selected use-case at the top
+- comparison rows underneath
+
+Comparison rows in plain English:
+- Best opening
+- Better for talking
+- Better for travel videos
+- Better for product videos
+- Stronger emotional payoff
+- Best overall choice
+
+Show a clear winner callout:
+- “Best overall for a product ad”
+or
+- “Best if you need voiceover space”
+
+Important:
+Do not use meaningless abstract numbers without explanation.
+If scores exist, accompany them with plain-English meaning.
+
+Motion:
+- cards slide in from different directions
+- winner badge glows subtly
+- rows animate progressively
+- hover over a track highlights its strengths
+
+==================================================
+SECTION 10 — RECENT ANALYSES / YOUR WORK
+==================================================
+
+Make BeatMap feel like something users return to.
+
+Heading:
+- “Your recent analyses”
+or
+- “Pick up where you left off”
+
+Content:
+- saved analysis cards
+- thumbnail
+- title
+- artist
+- preset
+- date/time
+- actions like Open / Compare / Reuse
+
+Design:
+- clean and friendly
+- rounded cards
+- maybe carousel on desktop or responsive grid
+- strong visual consistency with rest of site
+
+Motion:
+- cards stagger in
+- hover lift
+- action buttons appear elegantly
+- nice empty state if there is no history
+
+Empty state copy example:
+- “Your analyzed tracks will show up here.”
+- “Try a song to build your BeatMap library.”
+
+==================================================
+SECTION 11 — FINAL CTA BANNER
+==================================================
+
+I want a big premium CTA section before the footer.
+
+It should feel like a satisfying closing moment.
+
+Possible heading:
+- “Stop guessing. Start editing faster.”
+- “Try BeatMap with your next song.”
+- “Find the best part of the song before you even open your editor.”
+
+CTA buttons:
+- Analyze a Song
+- Explore Trending Tracks
+
+Visual style:
+- big rounded dark or gradient banner
+- soft glow
+- beautiful typography
+- maybe subtle animated music-energy background
+
+Motion:
+- reveal dramatically but tastefully
+- buttons hover beautifully
+- background has subtle living motion
+
+==================================================
+SECTION 12 — FOOTER
+==================================================
+
+The footer should be spacious, premium, and clean.
+
+Structure:
+- BeatMap brand left
+- link groups in columns
+- maybe links like:
+  - Product
+  - Explore
+  - Compare
+  - Library
+  - About
+- social icons
+- copyright
+- maybe tiny line of product positioning
+
+Style:
+- clean
+- airy
+- high-end
+- not cluttered
+
+Optional small CTA above footer:
+- “Analyze a song”
+or
+- “Shop trending tracks” is NOT relevant here
+Instead use a BeatMap-specific CTA.
+
+==================================================
+MOTION LANGUAGE FOR THE WHOLE SITE
+==================================================
+
+This is critical.
+
+I do not want a static pretty page.
+I want a motion-first landing page.
+
+Overall motion style:
+- premium
+- soft
+- layered
+- cinematic
+- responsive
+- modern
+- not cartoonishly bouncy
+- not robotic
+
+Use a coherent animation system across the site.
+
+Global animation rules:
+1. Section reveal
+- fade from opacity 0 to 1
+- move upward from y 24px to 0
+- stagger children
+- duration ~0.55 to 0.85s
+- smooth easing
+- only trigger when entering viewport
+
+2. Card hover
+- slight upward lift
+- tiny scale increase
+- soft shadow expansion
+- image zoom or glow if applicable
+
+3. Button hover
+- small scale + brightness/glow shift
+- optional icon movement
+- quick but premium response
+
+4. Tab change animation
+- fade + slight slide
+- preserve layout stability
+- no jarring jumping
+
+5. Hero scene transitions
+- crossfade
+- layered parallax
+- subtle zoom/pan
+- drifting glows or particles
+- maintain readability at all times
+
+6. Sticky nav transition
+- slight shrink on scroll
+- smooth shadow/border/background update
+
+7. Decorative motion
+- small floating particles
+- drifting ribbons
+- glowing lines
+- gradient movement
+- soft, sparse, tasteful
+
+8. Reduced motion support
+- respect reduced motion preferences
+- preserve clarity even with animations disabled
+
+==================================================
+SCROLL EXPERIENCE
+==================================================
+
+I want the scroll journey to feel choreographed.
+
+Page rhythm should be:
+- immersive dark hero
+- bright, clean explanation
+- visually useful sections
+- more interactive sections
+- confident closing CTA
+
+Scrolling should feel like:
+- moving through scenes
+- discovering the product
+- understanding it through examples
+- feeling momentum and curiosity
+
+Optional tasteful enhancements:
+- slight parallax between section layers
+- gradient background transitions between sections
+- sticky mini preview panels in one section if it helps
+- subtle section dividers made from glow/blur gradients instead of harsh lines
+
+==================================================
+INTERACTION DETAILS / MICROINTERACTIONS
+==================================================
+
+I want lots of small polish touches:
+- buttons pulse slightly on first appearance
+- analyze buttons on cards feel clickable and alive
+- input field focus feels premium
+- selected preset chip glows or shifts slightly
+- badges animate in softly
+- track artwork can shimmer subtly on hover
+- timeline chips animate into place
+- comparison winner badge softly pulses
+- recent analysis cards animate action buttons into view
+
+These details should make the site feel expensive.
+
+==================================================
+ACCESSIBILITY / CLARITY
+==================================================
+
+Do not sacrifice usability for style.
+
+Requirements:
+- strong text contrast
+- readable headings and body text
+- accessible button sizes
+- mobile-friendly spacing
+- focus states visible
+- reduced motion support
+- layout should remain understandable even if animations are reduced
+
+==================================================
+MOBILE / TABLET RESPONSIVENESS
+==================================================
+
+This must still feel premium on smaller screens.
+
+Requirements:
+- hero scales beautifully on mobile
+- floating nav becomes elegant mobile menu
+- cards stack cleanly
+- tabs remain usable
+- sections keep strong rhythm
+- trending cards and result preview should remain attractive on mobile
+- animations should remain smooth, but lighter on mobile if necessary
+
+Do not make mobile feel like a downgraded afterthought.
+
+==================================================
+IMPLEMENTATION APPROACH
+==================================================
+
+Inspect the existing BeatMap codebase first.
+Then redesign/refactor the homepage and related components cleanly.
+
+Strong preference:
+- reusable React components
+- clean folder structure
+- maintainable code
+- animation handled elegantly
+- use Framer Motion if appropriate
+- do not put everything into one giant file
+- preserve working app functionality
+- connect sections to real data where appropriate
+- if data is not available, use clean fallbacks without breaking design
+
+Suggested components:
+- FloatingNav
+- HeroSceneCarousel
+- HeroContent
+- HeroQuickActions
+- IntroSection
+- PresetSelector
+- TrendingSection
+- ResultShowcase
+- ValueGrid
+- WorkflowSection
+- ComparisonPreview
+- RecentAnalysesSection
+- FinalCTA
+- Footer
+
+==================================================
+COPY / CONTENT DIRECTION
+==================================================
+
+Please rewrite the homepage copy so it feels simple, helpful, and high-end.
+
+Tone:
+- clear
+- confident
+- friendly
+- creator-focused
+- not technical
+- not cheesy
+- not corporate
+
+Avoid:
+- “revolutionary”
+- “cutting-edge AI platform”
+- “next-generation intelligence engine”
+- generic startup buzzwords
+
+Prefer:
+- “Find the best part of the song.”
+- “Know where to talk over the music.”
+- “Compare tracks before you edit.”
+- “Use trending songs faster.”
+- “Build a simple shot plan.”
+
+==================================================
+IMPORTANT PRODUCT RULES
+==================================================
+
+- Keep BeatMap original.
+- Do not imitate the reference brand literally.
+- Prioritize usefulness, not just decoration.
+- The homepage should still drive people toward actual product actions.
+- Make it feel magical but practical.
+- Every section should answer “Why would I use this?”
+
+==================================================
+AFTER IMPLEMENTATION
+==================================================
+
+After making the changes, provide:
+1. A summary of the redesign
+2. Components created/updated
+3. Animation system used
+4. Any dependencies added
+5. How to test the homepage interactions
+6. Any limitations still remaining
+7. Suggested git commit message
+
+Start by inspecting the current homepage and related components, then implement this redesign directly in my existing BeatMap codebase.
