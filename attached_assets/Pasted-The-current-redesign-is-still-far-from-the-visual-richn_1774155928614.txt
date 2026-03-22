@@ -1,0 +1,513 @@
+The current redesign is still far from the visual richness and immersive storytelling I want.
+
+IMPORTANT:
+Do not make small tweaks.
+Do not just swap colors, add another character, or add a few floating elements.
+I want a major visual art-direction upgrade.
+
+The current problem is:
+- the hero still looks too simple
+- the right side feels like a static character card, not a world
+- there is too much empty space
+- the scenes feel like “UI + one character” instead of “immersive animated illustrated environment”
+- the characters feel pasted in, not integrated into a magical scene
+- there are not enough layers, props, creatures, environmental elements, depth, or motion details
+- it still feels like a good startup landing page, not like the rich dreamy visual world from the reference
+
+I want the site to feel much closer to the emotional richness, density, layering, and wonder of the reference video — while still being completely original to BeatMap.
+
+DO NOT COPY THE REFERENCE LITERALLY.
+But DO match the same level of:
+- visual imagination
+- scene richness
+- layered illustration
+- whimsical world-building
+- animated depth
+- premium storytelling
+- handcrafted feeling
+- large illustrated environments
+- playful, surprising visual composition
+
+==================================================
+WHAT IS WRONG WITH THE CURRENT HERO
+==================================================
+
+The current hero has these issues:
+1. It is too empty.
+2. The character sits in a simple framed card instead of living inside a world.
+3. The background feels like a gradient backdrop, not an illustrated scene.
+4. The visuals do not tell a story.
+5. There are no meaningful surrounding props, companions, creatures, objects, environment pieces, or world details.
+6. The composition is too symmetrical and too safe.
+7. It lacks the “dense illustrated ecosystem” feel from the reference.
+8. The motion is likely too subtle and not layered enough.
+9. The page feels like a polished SaaS landing page with character art, not an imaginative creative universe.
+10. It does not create the “wow, I want to keep scrolling” feeling.
+
+==================================================
+CORE EXPECTATION
+==================================================
+
+I want BeatMap to look like a premium illustrated world where:
+- songs become living energy
+- trends become places
+- editing becomes a journey
+- music timing becomes visible as magical objects and structures
+- creators move through worlds made of sound, rhythm, and visual storytelling
+
+Think:
+BeatMap is a living fantasy-tech universe for creators.
+
+I want the homepage to feel like moving through a series of richly illustrated scenes, not just sections with UI blocks.
+
+==================================================
+VISUAL GOAL
+==================================================
+
+The final result should feel:
+- much richer
+- more layered
+- more artistic
+- more immersive
+- more cinematic
+- more whimsical
+- more premium
+- more character-filled
+- more environment-driven
+- more surprising
+- more alive
+
+It should NOT feel like:
+- one character pasted onto a dark gradient
+- a dribbble shot
+- a generic AI startup site
+- a clean SaaS page with mascots
+- a dashboard with decoration
+
+It SHOULD feel like:
+- a hand-crafted animated illustrated universe
+- a creative-tech storybook for music and editing
+- an immersive digital world users want to explore
+
+==================================================
+MAIN ART-DIRECTION CHANGE I WANT
+==================================================
+
+Stop designing the hero as:
+left text + right portrait card.
+
+Instead, redesign the hero as:
+left anchored content + massive illustrated environmental world that fills the rest of the container.
+
+The character should not be presented like a poster or collectible card.
+The character should exist inside a full scene.
+
+That scene should include:
+- environment
+- foreground elements
+- midground story elements
+- background depth
+- floating companion creatures
+- music-energy objects
+- atmospheric effects
+- world-specific props
+- light sources
+- motion trails
+- layered composition
+
+The whole hero should feel like a scene from a premium animated creative universe.
+
+==================================================
+WHAT I WANT INSTEAD OF SIMPLE CHARACTER CARDS
+==================================================
+
+Do NOT keep a single boxed portrait character on the right as the primary visual pattern.
+
+Replace that with full illustrated scene worlds such as:
+
+1. TRENDING WORLD
+- a glowing floating world map or stylized music planet
+- islands or regions representing different languages / music cultures
+- tracks as moving lights or cards traveling between places
+- a central explorer / DJ / music guide character
+- tiny companion creatures carrying song cards or trend signals
+- glowing pathways connecting music regions
+- sky, depth haze, floating structures, environmental particles
+- scene should feel expansive and alive
+
+2. CREATOR STUDIO WORLD
+- a big room / dream studio / music lab / futuristic editing sanctuary
+- stylized creator figure interacting with giant floating timeline strips
+- helper creatures moving timestamp markers or carrying glowing cut points
+- song cards orbiting around the creator
+- environment props like monitors, floating speakers, visual waves, hanging lights, scene frames
+- layered furniture/objects/background architecture
+- not a plain room, but a magical creative workspace
+
+3. SHORT-FORM ENERGY WORLD
+- vertical-video energy universe
+- dynamic motion trails
+- stylized creator leaping/riding/surfing through fast-moving song segments
+- floating phones, frames, reel cards, beat bursts
+- energetic tiny creatures guiding attention toward the best opening moments
+- layered bright accent lights and movement
+- stronger action and motion cues
+
+4. STORYTELLING WORLD
+- softer cinematic dreamscape
+- emotional mood arc visible as landscape or light path
+- floating memory creatures
+- creator figure walking through story beats or musical emotional zones
+- scenic depth, layered clouds, soft stars, glowing memory frames
+- feels emotional, reflective, beautiful, cinematic
+
+5. COMPARE WORLD
+- split visual world where 2 or 3 music energies are competing
+- mirrored creatures or song spirits facing each other
+- a guide figure in the center making a choice
+- floating badges, highlighted strengths, best-for-use markers
+- energy balance visualized as environment, not just charts
+
+==================================================
+HERO STRUCTURE I WANT NOW
+==================================================
+
+Keep the left text, but make the right and background side a true immersive world.
+
+Hero structure should feel like:
+- floating glass nav on top
+- huge rounded hero world container
+- left content anchored and readable
+- right / upper / background area dominated by an illustrated world
+- scene extends behind and around content, not just inside one small panel
+- decorative layers can overlap boundaries slightly in premium ways
+- entire hero is an environment
+
+Possible composition:
+- left 35% = text, CTA, input
+- right 65% = rich scene world
+- but allow background scene to spill across hero, including behind text with enough readability overlay
+
+==================================================
+RICHNESS / DENSITY EXPECTATION
+==================================================
+
+Increase visual density significantly.
+
+The scene needs many more things happening, for example:
+- large primary character or creature
+- 2–5 supporting creatures or companions
+- floating cards, music tokens, sound ribbons, timing markers
+- background structures / architecture / terrain / floating objects
+- layered atmospheric glows
+- animated particles
+- secondary focal points
+- foreground props
+- depth shadows / blur layers
+- environmental storytelling details
+
+The reference felt rich because every scene had:
+- a strong focal subject
+- multiple supporting visual details
+- a full environment
+- storytelling objects
+- visible depth
+- personality everywhere
+
+I want the same density level.
+
+==================================================
+CHARACTERS / CREATURES — HOW THEY SHOULD FEEL
+==================================================
+
+The current characters feel too isolated and too “card art”.
+
+I want a full original BeatMap character system.
+
+Introduce:
+1. MAIN GUIDE FIGURES
+- stylized creators / editors / DJs / visual storytellers
+- expressive poses
+- interacting with the world
+- not just standing
+- they should feel active, mid-action, purposeful
+
+2. MUSIC CREATURES
+- whimsical sound beings
+- creatures made of waveform light, rhythm ribbons, glowing notes, pulse shapes
+- cute but premium
+- imaginative
+- different creatures for different moods:
+  - hype
+  - cinematic
+  - emotional
+  - luxury
+  - dreamy
+  - trending/global
+
+3. HELPER COMPANIONS
+- small assistant-like creatures
+- carrying timestamps, dragging cut markers, lighting up sections, orbiting tracks
+- guide the eye toward product concepts
+
+4. WORLD-SPECIFIC BEINGS
+- each hero scene should have a cast that matches its use case
+
+The characters should not just be present.
+They should be interacting with the environment and the product concepts visually.
+
+==================================================
+POSE / ACTION EXPECTATION
+==================================================
+
+Do not use static front-facing standing poses as the default.
+Characters should feel alive and in-action.
+
+Examples:
+- reaching toward floating track cards
+- surfing on waveform ribbons
+- stepping through music portals
+- tuning glowing sound objects
+- guiding creatures through song paths
+- jumping, floating, leaning, pointing, building, mixing, discovering
+
+The visual storytelling should imply action and purpose.
+
+==================================================
+ENVIRONMENT DESIGN EXPECTATION
+==================================================
+
+This is the biggest missing piece right now.
+
+Every major hero scene needs a real environment.
+Not a flat background.
+Not just glow.
+Not just gradient.
+
+Possible environment ingredients:
+- floating islands
+- giant speakers as architecture
+- glowing bridges made of rhythm
+- suspended music cards
+- portal rings
+- dreamy clouds
+- celestial audio symbols
+- vertical reel frames as floating monuments
+- timeline rails as roads
+- soundwave rivers
+- cityscape lights
+- observatories for trending music
+- soft fantasy forests made of rhythm leaves
+- dream studio interiors
+- floating lanterns / music notes / signal orbs
+
+Use environment to make BeatMap feel like a world.
+
+==================================================
+COMPOSITION RULES
+==================================================
+
+I want much stronger scene composition.
+
+Rules:
+1. Every hero state should have a primary focal point.
+2. Every hero state should have secondary and tertiary visual anchors.
+3. Use foreground / midground / background separation.
+4. Add overlapping layers for depth.
+5. Use asymmetry and more dynamic composition.
+6. Break out of simple rectangle-with-character layouts.
+7. Let some elements float partially outside contained boxes if tasteful.
+8. Let the eye travel across the scene.
+
+The current design is too centered and contained.
+Make it more expansive, adventurous, and cinematic.
+
+==================================================
+MOTION / ANIMATION EXPECTATIONS
+==================================================
+
+The motion must become more layered and more magical.
+
+I want:
+1. MULTI-LAYER PARALLAX
+- foreground elements move slightly faster
+- background layers move slower
+- creates depth
+
+2. ENVIRONMENTAL MOTION
+- drifting particles
+- glowing dust
+- moving light trails
+- floating ribbons
+- gentle orbiting objects
+- pulsing signals on trending routes
+
+3. CHARACTER LIFE
+- subtle breathing / bobbing
+- small gesture loops
+- accessories moving
+- hair / cloth / glow accents reacting slightly
+
+4. WORLD ACTIVITY
+- creatures moving slowly
+- timeline markers gliding
+- trend pulses traveling across paths
+- floating cards gently rotating
+- sound energy flowing through the environment
+
+5. HERO TRANSITIONS
+- scene-to-scene transitions must feel premium and cinematic
+- not just fading between cards
+- use layered transition:
+  - background crossfade
+  - glow direction changes
+  - foreground slides or drifts
+  - character swap with scale/opacity/parallax
+  - support elements animate between scenes
+
+6. ON HOVER
+- subtle interactivity
+- cards can glow
+- creatures can respond
+- buttons feel alive
+- visual accents react slightly
+
+IMPORTANT:
+Animations must not be noisy or cheap.
+They should feel luxurious and smooth.
+
+==================================================
+LIGHTING / GLOW / ATMOSPHERE
+==================================================
+
+The visuals need richer lighting and atmosphere.
+
+Add:
+- stronger scene-specific glows
+- directional lighting
+- atmospheric haze
+- backlight around focal characters
+- soft bloom around important objects
+- layered color gradients that feel intentional
+- subtle vignettes for focus
+- scene-specific aura
+
+Current issue:
+The glow feels mostly like a simple background wash.
+I want lighting that supports the scene composition and storytelling.
+
+==================================================
+SECTIONS BEYOND HERO
+==================================================
+
+Do not stop at the hero.
+Carry the richer visual language into the rest of the homepage.
+
+Upgrade these sections too:
+
+1. INTRO SECTION
+- large group illustration
+- multiple characters
+- supporting creatures
+- visual storytelling environment
+- not just one static illustration
+
+2. TRENDING SECTION
+- richer section header art
+- a mini world map / floating global music scene
+- helper characters interacting with trending cards
+- more personality and motion
+
+3. PRESET SECTION
+- each preset needs a mini illustrated world, icon, or micro-scene
+- not just pills
+- more visual identity per preset
+
+4. RESULT SHOWCASE
+- assistant creatures guiding attention to results
+- visual storytelling around best cut / talking-over / shot plan
+- richer composition
+
+5. COMPARE SECTION
+- make comparison feel like a real scene or faceoff
+- use environments and track spirits, not only comparison cards
+
+6. CTA / FOOTER
+- final emotional illustrated moment
+- not a plain banner
+
+==================================================
+STYLE QUALITY BAR
+==================================================
+
+The art must feel:
+- custom
+- premium
+- editorial
+- imaginative
+- layered
+- polished
+- current
+- high taste
+
+It should NOT feel:
+- like AI-generated random fantasy poster art slapped into UI
+- like stock illustration
+- like a game character card gallery
+- like a single cyberpunk portrait with text beside it
+
+I want:
+a coherent visual brand universe for BeatMap.
+
+==================================================
+BEATMAP-SPECIFIC WORLD CONCEPT
+==================================================
+
+Use this concept to unify everything:
+
+“BeatMap is a living music universe where songs become landscapes, rhythm becomes architecture, and creators travel through sound worlds to find the exact moment their video comes alive.”
+
+Make this idea visible everywhere.
+
+==================================================
+PRACTICAL EXECUTION REQUIREMENTS
+==================================================
+
+Please inspect the current implementation and then do a serious visual upgrade.
+
+Requirements:
+- replace simple isolated portrait-card hero visuals
+- create multi-layer illustrated worlds
+- enrich background scenes heavily
+- integrate characters into environments
+- add more creatures, props, and storytelling objects
+- increase density without making it cluttered
+- improve transitions between hero scenes
+- maintain text readability
+- keep it responsive
+- keep it premium
+- preserve working product actions and navigation
+
+If needed:
+- redesign hero layout structure itself
+- redesign scene system
+- redesign section art direction
+- update animation architecture
+- add more components for scene layers and world-building
+
+==================================================
+WHAT I EXPECT AFTER THIS UPDATE
+==================================================
+
+After making changes, tell me:
+1. What exact visual-art direction changes were made
+2. How the hero composition changed
+3. Which new environment/world-building elements were added
+4. Which new creatures/characters/props were added
+5. How the animation system became richer
+6. Which sections received the largest visual upgrade
+7. What would still be the next step if we want to push it even further
+
+The key message:
+I am not asking for a cleaner version of the current design.
+I am asking for a much more immersive, layered, magical, premium, scene-driven visual world.
