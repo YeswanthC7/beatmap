@@ -1,84 +1,160 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { WaveBlob } from "@/components/creatures/WaveBlob";
-import { SpaceDJ } from "@/components/creatures/SpaceDJ";
-import { BeatGhost } from "@/components/creatures/BeatGhost";
-import { MoodCat } from "@/components/creatures/MoodCat";
-import { BeatBot } from "@/components/creatures/BeatBot";
 
-const CREATURES = [
-  { Component: WaveBlob,   bgFrom: "#7c2d12", bgTo: "#1c0a00", accent: "#f97316" },
-  { Component: SpaceDJ,    bgFrom: "#2e1065", bgTo: "#0a0030", accent: "#a855f7" },
-  { Component: BeatGhost,  bgFrom: "#701a75", bgTo: "#1a003a", accent: "#e879f9" },
-  { Component: MoodCat,    bgFrom: "#78350f", bgTo: "#1c0a00", accent: "#fbbf24" },
-  { Component: BeatBot,    bgFrom: "#134e4a", bgTo: "#00100f", accent: "#2dd4bf" },
+const SCENES = [
+  {
+    src: "/creatures/producer.png",
+    name: "The Producer",
+    tag: "Studio Session",
+    cardBg: "#1C1107",
+    cardBorder: "#f97316",
+    accent: "#f97316",
+    glow: "rgba(249,115,22,0.35)",
+    heroWash: "radial-gradient(ellipse 90% 100% at 90% 60%, rgba(249,115,22,0.18) 0%, transparent 65%)",
+  },
+  {
+    src: "/creatures/cyberdj.png",
+    name: "CyberDJ",
+    tag: "Drop Incoming",
+    cardBg: "#0D0018",
+    cardBorder: "#e879f9",
+    accent: "#e879f9",
+    glow: "rgba(232,121,249,0.35)",
+    heroWash: "radial-gradient(ellipse 90% 100% at 90% 60%, rgba(232,121,249,0.18) 0%, transparent 65%)",
+  },
+  {
+    src: "/creatures/jazzman.png",
+    name: "The Jazzman",
+    tag: "Late Night Vibes",
+    cardBg: "#120A00",
+    cardBorder: "#fbbf24",
+    accent: "#fbbf24",
+    glow: "rgba(251,191,36,0.35)",
+    heroWash: "radial-gradient(ellipse 90% 100% at 90% 60%, rgba(251,191,36,0.15) 0%, transparent 65%)",
+  },
+  {
+    src: "/creatures/lofi.png",
+    name: "Lo-Fi Beatmaker",
+    tag: "Chill Mode",
+    cardBg: "#00120D",
+    cardBorder: "#6ee7b7",
+    accent: "#6ee7b7",
+    glow: "rgba(110,231,183,0.30)",
+    heroWash: "radial-gradient(ellipse 90% 100% at 90% 60%, rgba(110,231,183,0.13) 0%, transparent 65%)",
+  },
+  {
+    src: "/creatures/raver.png",
+    name: "The Raver",
+    tag: "Peak Hours",
+    cardBg: "#080420",
+    cardBorder: "#818cf8",
+    accent: "#818cf8",
+    glow: "rgba(129,140,248,0.35)",
+    heroWash: "radial-gradient(ellipse 90% 100% at 90% 60%, rgba(129,140,248,0.18) 0%, transparent 65%)",
+  },
 ];
 
-const INTERVAL = 3800;
+const INTERVAL = 4500;
 
 export function CreatureShowcase() {
   const [active, setActive] = useState(0);
-  const [visible, setVisible] = useState(true);
+  const [phase, setPhase] = useState<"in" | "out">("in");
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setVisible(false);
+      setPhase("out");
       setTimeout(() => {
-        setActive((prev) => (prev + 1) % CREATURES.length);
-        setVisible(true);
-      }, 500);
+        setActive((a) => (a + 1) % SCENES.length);
+        setPhase("in");
+      }, 450);
     }, INTERVAL);
     return () => clearInterval(timer);
   }, []);
 
-  const current = CREATURES[active];
+  const s = SCENES[active];
 
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-end pr-8 overflow-hidden">
-      {/* Glow backdrop that changes colour with each creature */}
+    <>
+      {/* Subtle hero colour wash */}
       <div
-        className="absolute right-0 top-0 h-full w-1/2 transition-all duration-700"
-        style={{
-          background: `radial-gradient(ellipse 70% 90% at 85% 50%, ${current.accent}22, transparent)`,
-        }}
+        className="pointer-events-none absolute inset-0 transition-all duration-700"
+        style={{ background: s.heroWash }}
       />
 
-      {/* Creature frame */}
-      <div
-        className="relative flex items-center justify-center transition-all duration-500"
-        style={{
-          width: 280,
-          height: 280,
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0) scale(1)" : "translateY(12px) scale(0.96)",
-          filter: `drop-shadow(0 0 40px ${current.accent}55)`,
-        }}
-      >
-        {/* Pill bg behind the creature */}
-        <div
-          className="absolute inset-0 rounded-full blur-2xl opacity-30 transition-colors duration-700"
-          style={{ background: `radial-gradient(circle, ${current.bgFrom}, ${current.bgTo})` }}
-        />
-        <div className="relative z-10 w-full h-full animate-float">
-          <current.Component />
-        </div>
-      </div>
+      {/* Right-side character column */}
+      <div className="pointer-events-none absolute bottom-0 right-0 top-0 flex w-[48%] items-center justify-center pr-6 lg:pr-10">
 
-      {/* Dot nav */}
-      <div className="absolute bottom-6 right-8 flex gap-2">
-        {CREATURES.map((_, i) => (
-          <div
-            key={i}
-            className="rounded-full transition-all duration-300"
+        {/* Floating card */}
+        <div
+          className="relative rounded-3xl transition-all duration-500 ease-out overflow-hidden shadow-2xl"
+          style={{
+            width: "clamp(200px, 30vw, 360px)",
+            height: "clamp(280px, 55vh, 520px)",
+            opacity: phase === "in" ? 1 : 0,
+            transform: phase === "in"
+              ? "translateY(0) scale(1) rotate(-1.5deg)"
+              : "translateY(20px) scale(0.96) rotate(-1.5deg)",
+            backgroundColor: s.cardBg,
+            border: `2px solid ${s.cardBorder}22`,
+            boxShadow: `0 0 60px ${s.glow}, 0 24px 80px rgba(0,0,0,0.6)`,
+          }}
+        >
+          {/* Character fills card */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={s.src}
+            alt={s.name}
             style={{
-              width: i === active ? 20 : 6,
-              height: 6,
-              backgroundColor: i === active ? current.accent : "rgba(255,255,255,0.18)",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "top center",
+              display: "block",
             }}
           />
-        ))}
+
+          {/* Card footer */}
+          <div
+            className="absolute bottom-0 inset-x-0 px-4 py-3"
+            style={{
+              background: `linear-gradient(to top, ${s.cardBg}EE 60%, transparent)`,
+            }}
+          >
+            <p
+              className="font-display text-[10px] font-bold uppercase tracking-[0.2em]"
+              style={{ color: s.accent }}
+            >
+              {s.tag}
+            </p>
+            <p className="font-display text-base font-extrabold text-white/85 mt-0.5">
+              {s.name}
+            </p>
+          </div>
+
+          {/* Accent corner glow */}
+          <div
+            className="pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full blur-2xl"
+            style={{ backgroundColor: s.accent, opacity: 0.25 }}
+          />
+        </div>
+
+        {/* Dot nav below the card */}
+        <div className="absolute bottom-6 flex items-center gap-2.5">
+          {SCENES.map((sc, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width: i === active ? 22 : 6,
+                height: 6,
+                backgroundColor: i === active ? s.accent : "rgba(255,255,255,0.15)",
+                boxShadow: i === active ? `0 0 8px ${s.accent}` : "none",
+              }}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -92,7 +92,7 @@ export default function Home() {
   return (
     <main className="min-h-screen text-white">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden min-h-[92vh] flex flex-col justify-center">
+      <section className="relative overflow-hidden min-h-screen flex flex-col justify-center">
         <HeroBackground />
         <CreatureShowcase />
         <div className="relative mx-auto w-full max-w-7xl px-6 pb-10 pt-16 sm:px-8 sm:pt-24">
