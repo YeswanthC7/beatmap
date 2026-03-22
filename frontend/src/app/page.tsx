@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import type { SongAnalysisResult } from "@/types/analysis";
 import { analyzeAudio, analyzeSongLink, fetchAnalysisById } from "@/lib/api";
 import { AnalysisResult } from "@/components/analysis-result";
+import { CreatureShowcase } from "@/components/creature-showcase";
 import { EmptyState } from "@/components/empty-state";
 import { HeroBackground } from "@/components/hero-background";
 import { LinkInputForm } from "@/components/link-input-form";
@@ -11,7 +12,6 @@ import { MarqueeStrip } from "@/components/marquee-strip";
 import { RecentAnalyses } from "@/components/recent-analyses";
 import { Recorder } from "@/components/recorder";
 import { ScrollingCards } from "@/components/scrolling-cards";
-import { SectionHeader } from "@/components/section-header";
 
 type Tab = "link" | "mic" | "history";
 
@@ -92,16 +92,27 @@ export default function Home() {
   return (
     <main className="min-h-screen text-white">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden min-h-[92vh] flex flex-col justify-center">
         <HeroBackground />
-        <div className="relative mx-auto max-w-7xl px-6 pb-10 pt-16 sm:px-8 sm:pt-24">
-          <SectionHeader
-            eyebrow="BeatMap"
-            title="Turn any song into scene-fit intelligence"
-            description="Paste a song link or record live audio to generate timestamped mood shifts, hook windows, voiceover-safe sections, and creative use-case insights."
-          />
+        <CreatureShowcase />
+        <div className="relative mx-auto w-full max-w-7xl px-6 pb-10 pt-16 sm:px-8 sm:pt-24">
 
-          <div className="mt-12">
+          {/* Two-column: headline left, creature right (creature is absolute so just spacing) */}
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-orange-300 mb-6">
+              <span className="h-1.5 w-1.5 rounded-full bg-orange-400 animate-pulse" />
+              BeatMap
+            </div>
+            <h1 className="font-display text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl leading-[1.05]">
+              Turn any song into{" "}
+              <span className="gradient-text">scene intelligence</span>
+            </h1>
+            <p className="mt-5 max-w-md text-base leading-7 text-white/55 sm:text-lg">
+              Paste a YouTube or SoundCloud link — or record live — and get timestamped mood shifts, hook windows, voiceover gaps, and scene fits in seconds.
+            </p>
+          </div>
+
+          <div className="mt-10 max-w-2xl">
             <div className="mb-6 flex gap-2 rounded-2xl border border-white/8 bg-white/[0.04] p-1.5 sm:inline-flex">
               {tabs.map(({ id, label }) => (
                 <button
