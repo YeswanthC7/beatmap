@@ -1,17 +1,20 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { SongAnalysisResult } from "@/types/analysis";
+import type { EditPreset, SongAnalysisResult } from "@/types/analysis";
 import { analyzeAudio, analyzeSongLink, fetchAnalysisById } from "@/lib/api";
 import { AnalysisResult } from "@/components/analysis-result";
+import { CompareTracks } from "@/components/compare-tracks";
 import { CreatureShowcase } from "@/components/creature-showcase";
 import { EmptyState } from "@/components/empty-state";
 import { HeroBackground } from "@/components/hero-background";
 import { LinkInputForm } from "@/components/link-input-form";
 import { MarqueeStrip } from "@/components/marquee-strip";
+import { PresetSelector } from "@/components/preset-selector";
 import { RecentAnalyses } from "@/components/recent-analyses";
 import { Recorder } from "@/components/recorder";
 import { ScrollingCards } from "@/components/scrolling-cards";
+import { TrendingSection } from "@/components/trending-section";
 
 type Tab = "link" | "mic" | "history";
 
@@ -32,17 +35,20 @@ const TAB_STYLES: Record<Tab, { active: string; icon: string }> = {
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("link");
+  const [preset, setPreset] = useState<EditPreset>("general");
   const [result, setResult] = useState<SongAnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+  const [showCompare, setShowCompare] = useState(false);
 
   const handleLinkSubmit = useCallback(async (url: string) => {
     setLoading(true);
     setError("");
     setResult(null);
+    setShowCompare(false);
     try {
-      const data = await analyzeSongLink({ url });
+      const data = await analyzeSongLink({ url, preset });
       setResult(data);
       setHistoryRefreshKey((k) => k + 1);
     } catch (err: unknown) {
@@ -50,14 +56,15 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [preset]);
 
   const handleAudioReady = useCallback(async (file: File) => {
     setLoading(true);
     setError("");
     setResult(null);
+    setShowCompare(false);
     try {
-      const data = await analyzeAudio(file);
+      const data = await analyzeAudio(file, preset);
       setResult(data);
       setHistoryRefreshKey((k) => k + 1);
     } catch (err: unknown) {
@@ -65,12 +72,13 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [preset]);
 
   const handleOpenHistory = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
     setTab("link");
+    setShowCompare(false);
     try {
       const data = await fetchAnalysisById(id);
       setResult(data);
@@ -81,13 +89,22 @@ export default function Home() {
     }
   }, []);
 
+  // Called from the Trending section — auto-submit a track URL for analysis
+  const handleTrendingAnalyze = useCallback((url: string) => {
+    setTab("link");
+    setShowCompare(false);
+    handleLinkSubmit(url);
+  }, [handleLinkSubmit]);
+
   const tabs: { id: Tab; label: string }[] = [
     { id: "link", label: "Link" },
     { id: "mic", label: "Mic / Audio" },
     { id: "history", label: "History" },
   ];
 
-  const showScrollingCards = !loading && !error && !result && tab !== "history";
+  const isEmpty = !loading && !error && !result;
+  const showScrollingCards = isEmpty && tab !== "history";
+  const showTrending = isEmpty && tab !== "history" && !showCompare;
 
   return (
     <main className="min-h-screen text-white">
@@ -95,9 +112,10 @@ export default function Home() {
       <section className="relative overflow-hidden min-h-screen flex flex-col justify-center">
         <HeroBackground />
         <CreatureShowcase />
-        <div className="relative mx-auto w-full max-w-7xl px-6 pb-10 pt-16 sm:px-8 sm:pt-24">
 
-          {/* Two-column: headline left, creature right (creature is absolute so just spacing) */}
+        <div className="relative mx-auto w-full max-w-7xl px-6 pb-16 pt-16 sm:px-8 sm:pt-24">
+
+          {/* Headline */}
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-orange-300 mb-6">
               <span className="h-1.5 w-1.5 rounded-full bg-orange-400 animate-pulse" />
@@ -112,8 +130,11 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mt-10 max-w-2xl">
-            <div className="mb-6 flex gap-2 rounded-2xl border border-white/8 bg-white/[0.04] p-1.5 sm:inline-flex">
+          {/* Input panel */}
+          <div className="mt-10 max-w-2xl space-y-5">
+
+            {/* Tab switcher */}
+            <div className="flex gap-2 rounded-2xl border border-white/8 bg-white/[0.04] p-1.5 sm:inline-flex">
               {tabs.map(({ id, label }) => (
                 <button
                   key={id}
@@ -130,14 +151,49 @@ export default function Home() {
               ))}
             </div>
 
-            {tab === "link" && (
-              <div className="mb-8">
-                <LinkInputForm onSubmit={handleLinkSubmit} loading={loading} />
+            {/* Preset selector — show on link + mic tabs */}
+            {(tab === "link" || tab === "mic") && !loading && (
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
+                <PresetSelector value={preset} onChange={setPreset} />
               </div>
             )}
 
+            {/* Compare toggle */}
+            {tab === "link" && isEmpty && (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowCompare((v) => !v)}
+                  className={`rounded-full border px-4 py-2 text-xs font-bold transition-all ${
+                    showCompare
+                      ? "border-pink-500/40 bg-pink-500/15 text-pink-200"
+                      : "border-white/10 bg-white/[0.04] text-white/40 hover:text-white/70"
+                  }`}
+                >
+                  ⚖️ Compare multiple songs
+                </button>
+                {showCompare && (
+                  <p className="text-xs text-white/30">
+                    Find which song works best for your edit before committing.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Compare panel */}
+            {showCompare && tab === "link" && (
+              <div className="rounded-3xl border border-pink-500/20 bg-pink-500/[0.04] p-6">
+                <CompareTracks onClose={() => setShowCompare(false)} />
+              </div>
+            )}
+
+            {/* Link input */}
+            {tab === "link" && !showCompare && (
+              <LinkInputForm onSubmit={handleLinkSubmit} loading={loading} />
+            )}
+
+            {/* Mic input */}
             {tab === "mic" && !loading && (
-              <div className="mb-8 rounded-3xl border border-purple-500/20 bg-purple-500/5 p-6">
+              <div className="rounded-3xl border border-purple-500/20 bg-purple-500/5 p-6">
                 <p className="mb-4 text-sm text-white/45">
                   Record audio directly from your microphone for AI scene analysis.
                 </p>
@@ -145,8 +201,9 @@ export default function Home() {
               </div>
             )}
 
+            {/* History */}
             {tab === "history" && (
-              <div className="mb-8">
+              <div>
                 <h2 className="font-display mb-4 text-sm font-bold uppercase tracking-widest text-amber-300/70">
                   Recent analyses
                 </h2>
@@ -154,8 +211,9 @@ export default function Home() {
               </div>
             )}
 
+            {/* Loading spinner */}
             {loading && (
-              <div className="mb-8 flex flex-col items-center gap-5 py-16">
+              <div className="flex flex-col items-center gap-5 py-16">
                 <div className="relative">
                   <div
                     className="absolute inset-0 rounded-full animate-pulse-ring opacity-40"
@@ -169,11 +227,15 @@ export default function Home() {
                 <p className="text-sm font-medium text-white/40">
                   Analysing{tab === "mic" ? " your recording" : ""}…
                 </p>
+                <p className="text-xs text-white/20">
+                  Getting mood shifts, best cuts, shot plan, and voiceover windows.
+                </p>
               </div>
             )}
 
+            {/* Error */}
             {error && !loading && (
-              <div className="mb-8 rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4">
+              <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4">
                 <p className="text-sm font-semibold text-red-300">{error}</p>
                 <p className="mt-1 text-xs text-red-400/60">
                   Check that the backend is running and the link is a valid YouTube or SoundCloud URL.
@@ -181,18 +243,42 @@ export default function Home() {
               </div>
             )}
 
-            {!loading && !error && result && <AnalysisResult result={result} />}
+            {/* Result */}
+            {!loading && !error && result && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-white/30">
+                    Analysis complete — scroll down for cuts, shot plan, and more.
+                  </p>
+                  <button
+                    onClick={() => { setResult(null); setError(""); }}
+                    className="text-xs text-white/25 hover:text-white/50 transition-colors"
+                  >
+                    ← Analyse another
+                  </button>
+                </div>
+                <AnalysisResult result={result} />
+              </div>
+            )}
 
-            {!loading && !error && !result && tab !== "history" && <EmptyState />}
+            {/* Empty state hint */}
+            {isEmpty && tab !== "history" && !showCompare && <EmptyState />}
           </div>
         </div>
       </section>
 
-      {/* ── Marquee strip (always visible) ── */}
+      {/* ── Marquee strip ── */}
       <MarqueeStrip />
 
-      {/* ── Scrolling card showcase (only on empty state) ── */}
+      {/* ── Scrolling card showcase (empty state only) ── */}
       {showScrollingCards && <ScrollingCards />}
+
+      {/* ── Trending tracks section ── */}
+      {showTrending && (
+        <section className="mx-auto w-full max-w-7xl px-6 py-16 sm:px-8 sm:py-20">
+          <TrendingSection preset={preset} onAnalyze={handleTrendingAnalyze} />
+        </section>
+      )}
     </main>
   );
 }

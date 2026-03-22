@@ -6,9 +6,12 @@ from app.api.link_utils import detect_platform
 from app.api.schemas import (
     AlternativeTrack,
     AnalysisMode,
+    BestCut,
+    EditPreset,
     HookWindow,
     MoodShift,
     SceneFitSuggestion,
+    ShotPlanStep,
     SongAnalysisResult,
     TimeRange,
     VoiceoverSafeSection,
@@ -44,48 +47,22 @@ def _fallback_analysis(
     artist: str,
     failure_reason: str = "no_key",
 ) -> dict:
-    """Return honest placeholder analysis when AI is unavailable."""
     reason_msg = _FALLBACK_REASONS.get(failure_reason, _FALLBACK_REASONS["error"])
-    short = "AI scene analysis temporarily unavailable" if failure_reason == "quota" else "AI scene analysis unavailable"
+    short = "AI analysis temporarily unavailable" if failure_reason == "quota" else "AI analysis unavailable"
 
     return {
-        "summary": (
-            f'Metadata retrieved successfully. {reason_msg}'
-        ),
-        "moodShifts": [
-            {
-                "time": "00:00",
-                "label": short,
-                "intensity": "low",
-                "description": reason_msg,
-            }
+        "summary": f"Metadata retrieved successfully. {reason_msg}",
+        "moodShifts": [{"time": "00:00", "label": short, "intensity": "low", "description": reason_msg}],
+        "hookWindow": {"range": {"start": "00:00", "end": "00:30"}, "reason": reason_msg},
+        "voiceoverSafeSections": [{"range": {"start": "00:00", "end": "00:30"}, "safetyLevel": "okay", "reason": reason_msg}],
+        "sceneFits": [{"category": "montage", "confidence": 0.5, "reason": reason_msg, "bestRange": {"start": "00:00", "end": "00:30"}}],
+        "bestCuts": [
+            {"durationLabel": "15 seconds", "start": "00:00", "end": "00:15", "title": short, "reason": reason_msg, "confidence": 0.5},
+            {"durationLabel": "30 seconds", "start": "00:00", "end": "00:30", "title": short, "reason": reason_msg, "confidence": 0.5},
+            {"durationLabel": "45 seconds", "start": "00:00", "end": "00:45", "title": short, "reason": reason_msg, "confidence": 0.5},
         ],
-        "hookWindow": {
-            "range": {"start": "00:00", "end": "00:30"},
-            "reason": reason_msg,
-        },
-        "voiceoverSafeSections": [
-            {
-                "range": {"start": "00:00", "end": "00:30"},
-                "reason": reason_msg,
-            }
-        ],
-        "sceneFits": [
-            {
-                "category": "montage",
-                "confidence": 0.5,
-                "reason": reason_msg,
-                "bestRange": {"start": "00:00", "end": "00:30"},
-            }
-        ],
-        "alternatives": [
-            {
-                "title": short,
-                "artist": "—",
-                "source": "AI analysis unavailable",
-                "reason": reason_msg,
-            }
-        ],
+        "shotPlan": [{"label": short, "start": "00:00", "end": "00:30", "visualPurpose": "Placeholder", "explanation": reason_msg}],
+        "alternatives": [{"title": short, "artist": "—", "source": "AI unavailable", "reason": reason_msg}],
     }
 
 
@@ -96,6 +73,7 @@ def _build_result(
     source: str,
     source_label: str,
     platform: str,
+    preset: EditPreset,
     analysis_mode: AnalysisMode,
     youtube_video_id: str | None,
     soundcloud_path: str | None,
@@ -124,6 +102,7 @@ def _build_result(
     voiceover = [
         VoiceoverSafeSection(
             range=tr(vs.get("range", {})),
+            safetyLevel=vs.get("safetyLevel", "okay"),
             reason=vs.get("reason", ""),
         )
         for vs in ai.get("voiceoverSafeSections", [])
@@ -137,6 +116,29 @@ def _build_result(
             bestRange=tr(sf.get("bestRange", {})),
         )
         for sf in ai.get("sceneFits", [])
+    ]
+
+    best_cuts = [
+        BestCut(
+            durationLabel=bc.get("durationLabel", ""),
+            start=bc.get("start", "00:00"),
+            end=bc.get("end", "00:30"),
+            title=bc.get("title", ""),
+            reason=bc.get("reason", ""),
+            confidence=float(bc.get("confidence", 0.75)),
+        )
+        for bc in ai.get("bestCuts", [])
+    ]
+
+    shot_plan = [
+        ShotPlanStep(
+            label=sp.get("label", ""),
+            start=sp.get("start", "00:00"),
+            end=sp.get("end", "00:30"),
+            visualPurpose=sp.get("visualPurpose", ""),
+            explanation=sp.get("explanation", ""),
+        )
+        for sp in ai.get("shotPlan", [])
     ]
 
     alternatives = [
@@ -155,6 +157,7 @@ def _build_result(
         source=source,
         sourceLabel=source_label,
         platform=platform,
+        preset=preset,
         analysisMode=analysis_mode,
         youtubeVideoId=youtube_video_id,
         soundcloudPath=soundcloud_path,
@@ -164,12 +167,13 @@ def _build_result(
         hookWindow=hook_window,
         voiceoverSafeSections=voiceover,
         sceneFits=scene_fits,
+        bestCuts=best_cuts,
+        shotPlan=shot_plan,
         alternatives=alternatives,
     )
 
 
-async def analyse_link(url: str) -> SongAnalysisResult:
-    """Full pipeline for link-based analysis (YouTube or SoundCloud)."""
+async def analyse_link(url: str, preset: EditPreset = "general") -> SongAnalysisResult:
     source_label = _build_source_label(url)
     platform = detect_platform(url)
 
@@ -196,13 +200,14 @@ async def analyse_link(url: str) -> SongAnalysisResult:
             artist_name = meta.artist
             thumbnail_url = meta.thumbnail_url
 
-    logger.info("Analysing '%s' by %s [%s] — metadata_only mode", song_title, artist_name, platform)
+    logger.info("Analysing '%s' by %s [%s] preset=%s", song_title, artist_name, platform, preset)
 
     ai, failure_reason = await analyse_song_from_metadata(
         title=song_title,
         artist=artist_name,
         platform=platform,
         source_label=source_label,
+        preset=preset,
     )
 
     if ai is None:
@@ -214,6 +219,7 @@ async def analyse_link(url: str) -> SongAnalysisResult:
         source="link",
         source_label=source_label,
         platform=platform,
+        preset=preset,
         analysis_mode="metadata_only",
         youtube_video_id=youtube_video_id,
         soundcloud_path=soundcloud_path,
@@ -229,9 +235,8 @@ async def analyse_audio_upload(
     audio_bytes: bytes,
     filename: str,
     original_filename: str = "recording",
+    preset: EditPreset = "general",
 ) -> SongAnalysisResult:
-    """Full pipeline for uploaded/recorded audio analysis."""
-    import tempfile
     from app.services.audio.processor import cleanup_temp, save_upload_to_temp
 
     suffix = Path(filename).suffix or ".webm"
@@ -239,9 +244,9 @@ async def analyse_audio_upload(
 
     try:
         duration = get_audio_duration(audio_path) or 30.0
-        logger.info("Audio upload: file=%s size=%d duration=%.1fs", filename, len(audio_bytes), duration)
+        logger.info("Audio upload: file=%s size=%d duration=%.1fs preset=%s", filename, len(audio_bytes), duration, preset)
 
-        ai, failure_reason = await analyse_audio_file(audio_path, duration)
+        ai, failure_reason = await analyse_audio_file(audio_path, duration, preset=preset)
 
         if ai is None:
             ai = _fallback_analysis("Recorded Audio", "Unknown Artist", failure_reason)
@@ -252,6 +257,7 @@ async def analyse_audio_upload(
             source="mic",
             source_label=f"mic/{original_filename}",
             platform="mic",
+            preset=preset,
             analysis_mode="recorded_audio",
             youtube_video_id=None,
             soundcloud_path=None,

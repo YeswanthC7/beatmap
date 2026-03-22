@@ -4,7 +4,7 @@ import sqlite3
 import uuid
 from datetime import datetime, timezone
 
-from app.api.schemas import AnalysisMode, AnalysisRecord, SongAnalysisResult
+from app.api.schemas import AnalysisMode, AnalysisRecord, EditPreset, SongAnalysisResult
 from app.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -28,9 +28,15 @@ async def init_db() -> None:
                 artist_name TEXT NOT NULL,
                 thumbnail_url TEXT,
                 analysis_mode TEXT NOT NULL,
+                preset TEXT NOT NULL DEFAULT 'general',
                 result_json TEXT NOT NULL
             )
         """)
+        # Migration: add preset column if missing (for existing DBs)
+        try:
+            conn.execute("ALTER TABLE analyses ADD COLUMN preset TEXT NOT NULL DEFAULT 'general'")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         conn.commit()
     logger.info("Database initialised at %s", settings.db_path)
 
@@ -38,7 +44,6 @@ async def init_db() -> None:
 async def save_analysis(result: SongAnalysisResult) -> str:
     record_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc).isoformat()
-
     result_with_id = result.model_copy(update={"id": record_id})
 
     with _get_connection() as conn:
@@ -46,8 +51,8 @@ async def save_analysis(result: SongAnalysisResult) -> str:
             """
             INSERT INTO analyses
                 (id, created_at, platform, source_label, song_title,
-                 artist_name, thumbnail_url, analysis_mode, result_json)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 artist_name, thumbnail_url, analysis_mode, preset, result_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 record_id,
@@ -58,12 +63,13 @@ async def save_analysis(result: SongAnalysisResult) -> str:
                 result.artistName,
                 result.thumbnailUrl,
                 result.analysisMode,
+                result.preset,
                 result_with_id.model_dump_json(),
             ),
         )
         conn.commit()
 
-    logger.info("Saved analysis %s for '%s'", record_id, result.songTitle)
+    logger.info("Saved analysis %s for '%s' [preset=%s]", record_id, result.songTitle, result.preset)
     return record_id
 
 
@@ -72,7 +78,7 @@ async def list_analyses(limit: int = 20) -> list[AnalysisRecord]:
         rows = conn.execute(
             """
             SELECT id, created_at, platform, source_label,
-                   song_title, artist_name, thumbnail_url, analysis_mode
+                   song_title, artist_name, thumbnail_url, analysis_mode, preset
             FROM analyses
             ORDER BY created_at DESC
             LIMIT ?
@@ -80,8 +86,10 @@ async def list_analyses(limit: int = 20) -> list[AnalysisRecord]:
             (limit,),
         ).fetchall()
 
-    return [
-        AnalysisRecord(
+    records = []
+    for row in rows:
+        preset_val = row["preset"] if row["preset"] else "general"
+        records.append(AnalysisRecord(
             id=row["id"],
             createdAt=row["created_at"],
             platform=row["platform"],
@@ -90,9 +98,9 @@ async def list_analyses(limit: int = 20) -> list[AnalysisRecord]:
             artistName=row["artist_name"],
             thumbnailUrl=row["thumbnail_url"],
             analysisMode=row["analysis_mode"],
-        )
-        for row in rows
-    ]
+            preset=preset_val,
+        ))
+    return records
 
 
 async def get_analysis(record_id: str) -> SongAnalysisResult | None:

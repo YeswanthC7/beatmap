@@ -1,0 +1,563 @@
+Project: BeatMap
+Repo is already imported in Replit.
+
+Context:
+BeatMap is an AI music intelligence app with:
+- Frontend: Next.js + React + TypeScript + Tailwind
+- Backend: FastAPI + Python
+- Current status:
+  - link analysis exists
+  - YouTube metadata works
+  - Gemini/Grok-based analysis is at least partially working
+  - the app already has analysis cards like hook window, mood shifts, scene fit, voiceover-safe sections, and alternative tracks
+Goal:
+Turn BeatMap from “interesting AI demo” into a genuinely useful everyday creator tool.
+
+CRITICAL PRODUCT DIRECTION
+Do not make this feel like a developer tool.
+Design and wording must be understandable for users with very little technical knowledge.
+Everything on the homepage and analysis pages should feel simple, obvious, and practical for:
+- creators
+- editors
+- influencers
+- small businesses
+- marketers
+- students
+- people making reels/shorts/TikToks
+- users who do not understand terms like “hook window,” “waveform,” “metadata,” or “MCP”
+
+Use plain-English labels everywhere.
+Example:
+- Instead of only “Hook Window”, show “Best opening moment”
+- Instead of only “Voiceover-safe sections”, show “Best parts to talk over”
+- Instead of only “Scene-fit categories”, show “Best use cases”
+- Instead of only “Alternative tracks”, show “Similar tracks you can try”
+
+Also add short helper text under advanced concepts so the UI teaches the user naturally.
+
+DO NOT JUST ADD RANDOM FEATURES.
+Implement the following as a coherent product upgrade.
+
+==================================================
+PRIMARY FEATURES TO IMPLEMENT
+==================================================
+
+1. HOMEPAGE TRENDING TRACKS
+2. EDIT-TYPE PRESETS
+3. BEST CUT GENERATOR (15s / 30s / 45s)
+4. VOICEOVER-SAFE GUIDANCE
+5. SHOT-PLAN GENERATOR
+6. TRACK COMPARISON
+7. RECENT ANALYSES / SAVED HISTORY
+
+These features should work together and should feel like one product, not disconnected widgets.
+
+==================================================
+FEATURE 1 — HOMEPAGE TRENDING TRACKS
+==================================================
+
+Objective:
+Make the homepage feel alive and useful immediately, even before a user pastes a link.
+
+Build a “Trending now” section on the homepage with:
+- Top 10 Worldwide
+- Top 10 by language / region in separate tabs or filters
+
+Suggested language/region tabs:
+- Worldwide
+- English
+- Hindi
+- Telugu
+- Tamil
+- Spanish
+- Korean
+- Japanese
+
+If live real-time reliable chart data is not currently available in this environment:
+- implement a clean backend service abstraction for trending tracks
+- support a fallback data mode
+- use curated or seeded data as a fallback only if clearly labeled internally
+- do NOT show fake “live” wording if data is not truly live
+
+Requirements:
+1. Create a backend endpoint for trending tracks, for example:
+   - GET /api/trending
+   - optional query params like language, region, limit
+2. Normalize all trending items into a single backend schema with fields like:
+   - id
+   - rank
+   - title
+   - artist
+   - image
+   - language
+   - region
+   - source
+   - sourceUrl
+   - trendLabel (rising / steady / new)
+3. Build the homepage UI to display:
+   - horizontal card rail or clean grid
+   - rank number
+   - artwork
+   - title
+   - artist
+   - language/region badge
+   - trend tag
+   - an “Analyze” button
+4. Clicking “Analyze” should:
+   - prefill the input with the track source URL if available
+   - or open an analysis flow for that track
+5. Add simple plain-language section copy, for example:
+   - “Trending now”
+   - “Popular songs people are using right now”
+6. Add graceful empty/error states:
+   - loading spinner/skeleton
+   - “Couldn’t load trending songs”
+   - retry button
+7. Keep the design polished and consistent with BeatMap branding.
+
+IMPORTANT WORDING:
+Do NOT call it “Spotify charts” unless you are actually using Spotify-authorized data in a compliant way.
+Safer labels:
+- Trending now
+- Popular right now
+- Trending worldwide
+- Trending by language
+
+==================================================
+FEATURE 2 — EDIT-TYPE PRESETS
+==================================================
+
+Objective:
+Help users tell BeatMap what they want to make, in plain English.
+
+This should be one of the most prominent controls near the input and analysis experience.
+
+Add a “What are you making?” preset selector with user-friendly options such as:
+- Instagram Reel
+- TikTok / Short video
+- YouTube intro
+- Travel montage
+- Product ad
+- Fashion / luxury video
+- Emotional storytelling
+- Wedding / memory edit
+- Gym / hype edit
+- Podcast intro
+- Documentary / cinematic
+- Gaming montage
+- Vlog
+- Slideshow / memories
+
+Requirements:
+1. Create a clear preset UI:
+   - tabs, chips, dropdown, or card selector
+   - must be mobile-friendly
+   - must be easy to understand
+2. Add short helper text like:
+   - “Choose what you’re making so BeatMap can suggest the best part of the song for that type of video.”
+3. Send the selected preset to the backend in analysis requests.
+4. Update the backend analysis logic so recommendations change based on the preset.
+5. The preset should influence:
+   - best opening moment
+   - best 15s / 30s / 45s cut
+   - voiceover-safe suggestions
+   - scene fit / best use cases
+   - shot plan
+   - alternative track suggestions
+6. If no preset is selected, use a sensible default like “General edit”.
+
+UX requirement:
+A non-technical person should immediately understand:
+- why this control exists
+- how it helps them
+- what to choose
+
+==================================================
+FEATURE 3 — BEST CUT GENERATOR
+==================================================
+
+Objective:
+Automatically tell users the best segment of the song for common video lengths.
+
+This is one of the most useful everyday features.
+
+Add a new analysis section called something like:
+- “Best cuts for your video”
+or
+- “Best sections to use”
+
+Show recommended cuts for:
+- 15 seconds
+- 30 seconds
+- 45 seconds
+
+Each cut should include:
+- start time
+- end time
+- why this section works
+- use case fit
+- optional confidence
+- optional note if based on metadata-only vs audio-assisted reasoning
+
+Requirements:
+1. Extend backend response schema to include best cut recommendations.
+2. The logic should consider:
+   - edit preset
+   - energy arc
+   - opening strength
+   - likely payoff section
+   - voiceover suitability where relevant
+3. Return a structured array, for example:
+   - durationLabel
+   - start
+   - end
+   - title
+   - reason
+   - confidence
+4. The frontend should render these beautifully as cards or timeline chips.
+5. Add plain-language explanations like:
+   - “Best 15-second version for a quick reel”
+   - “Best 30-second version for storytelling”
+6. Add “Copy timestamps” or “Copy this cut” button if feasible.
+7. If the system is in metadata-only mode, explain it honestly:
+   - “This cut is estimated from metadata and AI reasoning”
+   - not fake certainty
+
+==================================================
+FEATURE 4 — VOICEOVER-SAFE GUIDANCE
+==================================================
+
+Objective:
+Make it easy for users to know where they can talk over the music.
+
+This is a high-value real-world feature.
+
+Requirements:
+1. Upgrade the current voiceover section so it is more practical and understandable.
+2. Rename or dual-label the section in plain language, for example:
+   - “Best parts to talk over”
+   - subtitle: “These sections are less busy and may work better for narration.”
+3. Return multiple segments with:
+   - start/end time
+   - safety level (great / okay / risky)
+   - reason
+4. If audio evidence is available, use it.
+5. If only metadata/AI inference is available, clearly label that.
+6. Add an optional filter or note based on preset:
+   - for ads and explainers, prioritize cleaner speaking space
+   - for hype edits, speaking space may matter less
+7. Use user-friendly color and wording.
+8. Avoid too much jargon like “spectral density” or “vocal masking” in the UI.
+9. If you want, add a tiny legend:
+   - Great for talking
+   - Could work
+   - Music may compete with speech
+
+==================================================
+FEATURE 5 — SHOT-PLAN GENERATOR
+==================================================
+
+Objective:
+Turn music analysis into an actual editing plan.
+
+This is a standout differentiator.
+
+Add a new section called something like:
+- “Suggested shot plan”
+- “How to cut your video to this track”
+
+For a selected edit type and a track, generate a simple sequence such as:
+- 0:00–0:03 → opening hook / attention grabber
+- 0:04–0:08 → setup shots
+- 0:09–0:14 → reveal / key visual
+- 0:15–0:21 → emotional buildup
+- 0:22–0:30 → payoff / CTA / ending
+
+Requirements:
+1. Extend backend analysis response to include shot plan steps.
+2. Each step should include:
+   - label/title
+   - start
+   - end
+   - suggested visual purpose
+   - short explanation
+3. The shot plan must adapt to edit preset.
+Examples:
+- Product ad → reveal, details, CTA
+- Travel montage → opening scenery, motion shots, scenic payoff
+- Emotional storytelling → memory setup, emotional peak, reflective ending
+- Gym hype edit → fast intro, intensity build, drop, power finish
+4. Frontend should render this in a way that feels easy to follow:
+   - numbered timeline
+   - cards
+   - vertical step list
+5. Use plain language with helpful hints.
+6. Add a “Copy shot plan” option if feasible.
+7. Keep the tone practical, not overly poetic.
+
+==================================================
+FEATURE 6 — TRACK COMPARISON
+==================================================
+
+Objective:
+Let users compare multiple songs for one creative goal.
+
+This is a major time-saver because people often test many songs manually.
+
+Build a compare mode where a user can:
+- add 2 to 3 tracks
+- choose one edit preset
+- compare which track is best for that purpose
+
+Requirements:
+1. Add a compare workflow on the frontend:
+   - a “Compare tracks” entry point
+   - let user paste 2–3 links
+   - reuse the edit-type preset selector
+2. Create backend compare support, either:
+   - dedicated endpoint like POST /api/compare
+   - or reuse existing analysis and aggregate results cleanly
+3. The comparison output should rank the tracks on practical dimensions like:
+   - best opening moment
+   - best 15-second cut
+   - best for voiceover
+   - strongest emotional payoff
+   - best overall fit for selected edit type
+4. Show a clear winner summary:
+   - “Best overall for product ad”
+   - “Best opening hook”
+   - “Best if you need to talk over the music”
+5. Keep the comparison understandable for beginners.
+6. Use side-by-side cards or a simple score layout.
+7. Add notes explaining why one track is better for the chosen use case.
+
+Important:
+Do not rely on meaningless scores alone.
+Always explain the ranking in plain English.
+
+==================================================
+FEATURE 7 — RECENT ANALYSES / SAVED HISTORY
+==================================================
+
+Objective:
+Make BeatMap feel like a real tool people return to.
+
+Requirements:
+1. Add persistence for analysis results.
+2. Save:
+   - id
+   - createdAt
+   - source
+   - sourceLabel
+   - platform
+   - title
+   - artist
+   - thumbnail
+   - preset used
+   - key result summary
+   - full result payload
+3. Add backend routes like:
+   - GET /api/analyses
+   - GET /api/analyses/{id}
+   - optional DELETE /api/analyses/{id}
+4. Add a frontend “Recent analyses” section or page.
+5. Each saved item should show:
+   - thumbnail
+   - title
+   - artist
+   - preset
+   - date/time
+   - quick action buttons like:
+     - Open
+     - Compare
+     - Re-analyze
+6. Ensure data persists across app restarts using a simple reliable approach suitable for Replit.
+7. Keep it simple and maintainable.
+8. If no saved analyses exist, show a nice empty state.
+
+==================================================
+NON-TECHNICAL FRIENDLY UX REQUIREMENTS
+==================================================
+
+This is extremely important.
+
+Every major feature should be understandable without technical knowledge.
+
+Add clear section names and helper text such as:
+- “Paste a song link”
+- “Choose what you’re making”
+- “See the best part of the song to use”
+- “Find the best part to talk over”
+- “Get a simple shot plan”
+- “Compare songs before you edit”
+
+Do not assume the user knows:
+- hook window
+- scene-fit intelligence
+- metadata
+- inference
+- ranking model
+- confidence calibration
+
+If technical fields exist internally, translate them into plain UI wording.
+
+Examples:
+- Hook Window → Best opening moment
+- Scene Fit → Best use cases
+- Voiceover Safe → Best parts to talk over
+- Alternative Tracks → Similar tracks to try
+- Analysis Mode → How this result was created
+
+Add tiny info/helper text where useful:
+- “This recommendation is based on the song details and AI reasoning”
+- “This recommendation used stronger audio clues”
+- “These are suggested sections to help you edit faster”
+
+==================================================
+HOMEPAGE INFORMATION ARCHITECTURE
+==================================================
+
+Rework the homepage so it feels like a useful product from the first visit.
+
+Recommended homepage order:
+1. Hero section
+2. Input area (paste link / record audio if already available)
+3. Edit-type preset selector
+4. Trending now
+5. Result preview or latest analysis section
+6. Best cuts / shot-plan / voiceover highlights
+7. Recent analyses
+
+The homepage should immediately answer:
+- What does BeatMap do?
+- Why is it useful?
+- What should I do first?
+- Can it help me right now even if I don’t know music editing terms?
+
+==================================================
+BACKEND REQUIREMENTS
+==================================================
+
+Refactor and extend backend cleanly.
+Do not dump everything into routes.
+
+Suggested backend modules:
+- app/api/
+- app/services/trending/
+- app/services/analysis/
+- app/services/presets/
+- app/services/comparison/
+- app/services/persistence/
+- app/services/recommendations/
+- app/services/formatting/
+
+Requirements:
+1. Keep routes thin.
+2. Use typed Pydantic schemas.
+3. Centralize config in settings.
+4. Add helpful logging.
+5. Gracefully handle missing external keys or source failures.
+6. Use transparent fallbacks if data is unavailable.
+7. Preserve current working analysis features.
+
+Suggested endpoints:
+- GET /health
+- POST /api/analyze/link
+- GET /api/trending
+- GET /api/analyses
+- GET /api/analyses/{id}
+- POST /api/compare
+- optional DELETE /api/analyses/{id}
+
+==================================================
+FRONTEND REQUIREMENTS
+==================================================
+
+Refactor or extend frontend into reusable components such as:
+- hero
+- link-input-form
+- preset-selector
+- trending-section
+- best-cuts-section
+- voiceover-section
+- shot-plan-section
+- compare-tracks
+- recent-analyses
+- status-state / empty-state / error-state
+
+Requirements:
+1. Mobile-friendly layout
+2. Strong empty/loading/error states
+3. Polished visual design
+4. Reusable components
+5. User-friendly labels
+6. No backend secrets exposed
+
+==================================================
+ANALYSIS QUALITY REQUIREMENTS
+==================================================
+
+Do not just show more UI.
+The recommendations should become more useful.
+
+Improve analysis outputs so they are practical, for example:
+- “Best 15-second cut for a travel reel”
+- “Strong opening if you want fast attention”
+- “Safer section for narration”
+- “Good place for product reveal”
+- “Works best for emotional montage”
+- “This track has a slower opening, so it may work better for storytelling than for an ad”
+
+Make outputs feel like advice a creator can use immediately.
+
+==================================================
+IMPORTANT FALLBACK / HONESTY RULES
+==================================================
+
+If BeatMap only has metadata-level understanding and not deep waveform evidence:
+- do not fake certainty
+- do not pretend it truly analyzed every second of audio
+- say so in a helpful way
+- still make the output useful
+
+If trending data is not fully live:
+- do not use misleading wording like “live worldwide chart”
+- use a safe label like “Trending now”
+
+If comparison is partly inference-driven:
+- explain that clearly but simply
+
+==================================================
+TESTING REQUIREMENTS
+==================================================
+
+After implementation:
+1. Run the project in Replit.
+2. Verify:
+   - homepage loads
+   - trending tracks render
+   - analyze from trending works
+   - preset selection changes recommendations
+   - best cuts render
+   - voiceover-friendly sections render clearly
+   - shot plan renders
+   - compare 2–3 tracks works
+   - recent analyses save and reopen
+3. Fix any broken state or missing UI wiring.
+4. Remove stale placeholder/demo copy that conflicts with the new product direction.
+
+==================================================
+DELIVERABLES I WANT FROM YOU
+==================================================
+
+After making the changes, provide:
+1. Summary of what was implemented
+2. Files changed and why
+3. New endpoints added
+4. New dependencies added
+5. Any new environment variables needed
+6. Exact test steps in Replit
+7. Any limitations still remaining
+8. Suggested git commit message
+
+Start by inspecting the current repo, then implement everything directly in the existing BeatMap codebase without breaking current working functionality.
