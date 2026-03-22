@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
-import { Syne, Inter } from "next/font/google";
+import { Anton, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+const anton = Anton({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-syne",
+  weight: ["400"],
+  variable: "--font-anton",
   display: "swap",
 });
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["400", "700"],
+  variable: "--font-space",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "BeatMap",
+  title: "BeatMap — Find the best part of any song",
   description:
-    "AI-powered music intelligence engine for scene-fit insights, hook detection, and creative-use recommendations.",
+    "AI-powered music intelligence engine. Paste a link, get timestamps, best cuts, and a full edit plan for your video.",
 };
 
 export default function RootLayout({
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${inter.variable}`}>
+    <html lang="en" className={`${anton.variable} ${spaceGrotesk.variable}`}>
       <body>{children}</body>
     </html>
   );

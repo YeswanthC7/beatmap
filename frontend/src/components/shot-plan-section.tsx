@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { EditPreset, ShotPlanStep } from "@/types/analysis";
 import { PRESET_OPTIONS } from "@/types/analysis";
 
@@ -11,51 +10,49 @@ interface ShotPlanSectionProps {
   preset: EditPreset;
 }
 
-const STEP_COLORS = [
-  { border: "border-orange-500/25", bg: "bg-orange-500/[0.06]", num: "text-orange-400", dot: "#f97316" },
-  { border: "border-pink-500/25",   bg: "bg-pink-500/[0.06]",   num: "text-pink-400",   dot: "#ec4899" },
-  { border: "border-purple-500/25", bg: "bg-purple-500/[0.06]", num: "text-purple-400", dot: "#8b5cf6" },
-  { border: "border-blue-500/25",   bg: "bg-blue-500/[0.06]",   num: "text-blue-400",   dot: "#3b82f6" },
-  { border: "border-teal-500/25",   bg: "bg-teal-500/[0.06]",   num: "text-teal-400",   dot: "#14b8a6" },
-  { border: "border-amber-500/25",  bg: "bg-amber-500/[0.06]",  num: "text-amber-400",  dot: "#f59e0b" },
-  { border: "border-green-500/25",  bg: "bg-green-500/[0.06]",  num: "text-green-400",  dot: "#22c55e" },
-];
+const STEP_ACCENTS = ["#CCFF00", "#FF007F", "#66FCF1", "#FF003C", "#FFB800", "#CCFF00", "#FF007F"];
+
+function parseTime(t: string): number {
+  const parts = t.split(":").map(Number);
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return parts[0] ?? 0;
+}
 
 function MiniTimeline({ steps }: { steps: ShotPlanStep[] }) {
-  function parseTime(t: string): number {
-    const parts = t.split(":").map(Number);
-    if (parts.length === 2) return parts[0] * 60 + parts[1];
-    return parts[0] ?? 0;
-  }
-
-  const starts = steps.map((s) => parseTime(s.start));
   const ends = steps.map((s) => parseTime(s.end));
   const totalEnd = Math.max(...ends);
   if (totalEnd === 0) return null;
 
   return (
-    <div className="mb-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Timeline overview</p>
-      <div className="relative h-6 w-full rounded-full bg-white/[0.05] overflow-hidden">
+    <div className="mb-6 p-4" style={{ border: "2px solid rgba(255,255,255,0.07)" }}>
+      <p className="font-body font-bold text-[10px] uppercase tracking-widest mb-3"
+        style={{ color: "rgba(255,255,255,0.25)" }}>
+        TIMELINE OVERVIEW
+      </p>
+      <div className="relative h-5 w-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
         {steps.map((step, i) => {
-          const cfg = STEP_COLORS[i % STEP_COLORS.length];
+          const accent = STEP_ACCENTS[i % STEP_ACCENTS.length];
           const left = (parseTime(step.start) / totalEnd) * 100;
           const width = ((parseTime(step.end) - parseTime(step.start)) / totalEnd) * 100;
           return (
-            <div
-              key={i}
-              className="absolute top-0 bottom-0 rounded-sm flex items-center justify-center overflow-hidden"
-              style={{ left: `${left}%`, width: `${Math.max(width, 2)}%`, background: cfg.dot + "40",
-                borderRight: `1px solid ${cfg.dot}60` }}
-            >
-              <span className="text-[9px] font-extrabold" style={{ color: cfg.dot }}>{i + 1}</span>
+            <div key={i} className="absolute top-0 bottom-0 flex items-center justify-center overflow-hidden"
+              style={{
+                left: `${left}%`, width: `${Math.max(width, 2)}%`,
+                background: accent + "30",
+                borderRight: `1px solid ${accent}50`,
+              }}>
+              <span className="font-display text-[9px]" style={{ color: accent }}>{i + 1}</span>
             </div>
           );
         })}
       </div>
       <div className="flex justify-between mt-1">
-        <span className="text-[9px] text-white/20">{steps[0]?.start ?? "0:00"}</span>
-        <span className="text-[9px] text-white/20">{steps[steps.length - 1]?.end ?? ""}</span>
+        <span className="font-body text-[9px]" style={{ color: "rgba(255,255,255,0.2)" }}>
+          {steps[0]?.start ?? "0:00"}
+        </span>
+        <span className="font-body text-[9px]" style={{ color: "rgba(255,255,255,0.2)" }}>
+          {steps[steps.length - 1]?.end ?? ""}
+        </span>
       </div>
     </div>
   );
@@ -87,94 +84,105 @@ export function ShotPlanSection({ steps, preset }: ShotPlanSectionProps) {
     <div>
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <p className="font-display text-xs font-bold uppercase tracking-[0.2em] text-teal-400/60 mb-1">
-            How to cut it
-          </p>
-          <h2 className="font-display text-2xl font-extrabold text-white">Suggested shot plan</h2>
-          <p className="mt-1 text-xs text-white/35">
-            {steps.length} steps for a <strong className="text-white/60">{presetLabel}</strong>.
-            Click any step to expand the full editing advice.
+          <h2 className="font-display text-2xl uppercase text-white mb-1" style={{ letterSpacing: "0.02em" }}>
+            SHOT PLAN
+          </h2>
+          <p className="font-body text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+            {steps.length} STEPS FOR A <span className="font-bold text-white/60 uppercase">{presetLabel}</span>.
+            CLICK ANY STEP TO EXPAND EDITING NOTES.
           </p>
         </div>
         <button onClick={copyPlan}
-          className="shrink-0 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all"
+          className="shrink-0 font-body font-bold text-[10px] uppercase tracking-widest px-3 py-1.5 transition-all"
           style={{
-            borderColor: copyDone ? "rgba(20,184,166,0.5)" : "rgba(255,255,255,0.1)",
-            background: copyDone ? "rgba(20,184,166,0.1)" : "rgba(255,255,255,0.04)",
-            color: copyDone ? "#2dd4bf" : "rgba(255,255,255,0.4)",
+            border: `2px solid ${copyDone ? "#CCFF00" : "rgba(255,255,255,0.15)"}`,
+            background: copyDone ? "#CCFF00" : "transparent",
+            color: copyDone ? "#000" : "rgba(255,255,255,0.4)",
           }}
         >
-          {copyDone ? "✓ Copied!" : "Copy plan"}
+          {copyDone ? "✓ COPIED" : "COPY PLAN"}
         </button>
       </div>
 
       <MiniTimeline steps={steps} />
 
-      <div className="relative">
-        <div className="absolute left-5 top-0 bottom-0 w-px bg-white/[0.06]" />
+      <div className="space-y-2">
+        {steps.map((step, i) => {
+          const accent = STEP_ACCENTS[i % STEP_ACCENTS.length];
+          const isOpen = expanded === i;
 
-        <div className="space-y-3">
-          {steps.map((step, i) => {
-            const cfg = STEP_COLORS[i % STEP_COLORS.length];
-            const isOpen = expanded === i;
+          return (
+            <motion.div key={i}
+              initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.06, duration: 0.35 }}
+              className="flex gap-3"
+            >
+              {/* Number */}
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center font-display text-sm"
+                style={{
+                  border: `2px solid ${accent}40`,
+                  color: accent,
+                  background: isOpen ? accent + "15" : "transparent",
+                  boxShadow: isOpen ? `0 0 16px ${accent}30` : "none",
+                  transition: "all 0.2s",
+                }}>
+                {i + 1}
+              </div>
 
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.06, duration: 0.35 }}
-                className="relative flex gap-4"
+              {/* Card */}
+              <button
+                onClick={() => setExpanded(isOpen ? null : i)}
+                className="flex-1 text-left transition-all"
+                style={{
+                  border: `2px solid ${isOpen ? accent + "40" : "rgba(255,255,255,0.07)"}`,
+                  background: isOpen ? accent + "08" : "transparent",
+                }}
               >
-                {/* Step number bubble */}
-                <div className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-[#07040f] ${cfg.border}`}
-                  style={{ boxShadow: isOpen ? `0 0 16px ${cfg.dot}40` : "none" }}>
-                  <span className={`font-display text-sm font-extrabold ${cfg.num}`}>{i + 1}</span>
+                <div className="flex items-start justify-between gap-2 p-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-body font-bold text-sm text-white">{step.label}</p>
+                    <p className="font-body text-xs mt-0.5" style={{ color: accent + "bb" }}>
+                      {step.visualPurpose}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="font-body text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                      {step.start} – {step.end}
+                    </span>
+                    <span className="font-body text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+                      {isOpen ? "▲" : "▼"}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Step card */}
-                <button
-                  onClick={() => setExpanded(isOpen ? null : i)}
-                  className={`flex-1 rounded-2xl border text-left transition-all ${cfg.border} ${cfg.bg}
-                    hover:brightness-110 focus:outline-none`}
-                >
-                  <div className="flex items-start justify-between gap-2 p-4">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-display text-sm font-extrabold text-white">{step.label}</p>
-                      <p className={`text-xs font-semibold mt-0.5 ${cfg.num}`}>{step.visualPurpose}</p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="font-mono text-xs text-white/35">{step.start} – {step.end}</span>
-                      <span className="text-white/25 text-xs">{isOpen ? "▲" : "▼"}</span>
-                    </div>
-                  </div>
-
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-4 pb-4 border-t border-white/[0.05] pt-3">
-                          <p className="text-xs leading-5 text-white/60">{step.explanation}</p>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); copyStep(step, i); }}
-                            className="mt-3 text-[10px] font-semibold text-white/25 hover:text-white/50 transition-colors"
-                          >
-                            Copy this step
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </button>
-              </motion.div>
-            );
-          })}
-        </div>
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-4 pb-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                        <p className="font-body text-xs leading-5" style={{ color: "rgba(255,255,255,0.55)" }}>
+                          {step.explanation}
+                        </p>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); copyStep(step, i); }}
+                          className="mt-3 font-body font-bold text-[10px] uppercase tracking-widest transition-colors"
+                          style={{ color: "rgba(255,255,255,0.2)" }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#CCFF00")}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.2)")}
+                        >
+                          COPY STEP
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

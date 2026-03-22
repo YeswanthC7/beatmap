@@ -15,32 +15,18 @@ interface AnalysisResultProps {
 
 type ResultTab = "overview" | "cuts" | "shotplan" | "voiceover" | "alternatives";
 
-const INTENSITY_STYLE: Record<string, string> = {
-  low:    "bg-blue-500/15 text-blue-300 border-blue-500/30",
-  medium: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  high:   "bg-orange-500/15 text-orange-300 border-orange-500/30",
+const INTENSITY_COLOR: Record<string, string> = {
+  low: "#66FCF1", medium: "#CCFF00", high: "#FF007F",
+};
+const INTENSITY_LABEL: Record<string, string> = {
+  low: "CALM", medium: "BUILDING", high: "PEAK",
 };
 
-const INTENSITY_DOT: Record<string, string> = {
-  low: "#3b82f6", medium: "#f59e0b", high: "#f97316",
+const SAFETY_COLOR: Record<string, string> = {
+  great: "#CCFF00", okay: "#FFB800", risky: "#FF003C",
 };
-
-const SAFETY_STYLE: Record<string, string> = {
-  great: "bg-green-500/15 text-green-300 border-green-500/30",
-  okay:  "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  risky: "bg-red-500/15 text-red-300 border-red-500/30",
-};
-
 const SAFETY_LABEL: Record<string, string> = {
-  great: "Great for talking",
-  okay:  "Could work",
-  risky: "Music may compete",
-};
-
-const PLATFORM_BADGE: Record<string, string> = {
-  youtube:    "border-red-500/30 bg-red-500/10 text-red-300",
-  soundcloud: "border-orange-500/30 bg-orange-500/10 text-orange-300",
-  mic:        "border-purple-500/30 bg-purple-500/10 text-purple-300",
+  great: "GREAT", okay: "COULD WORK", risky: "RISKY",
 };
 
 const SCENE_ICON: Record<string, string> = {
@@ -53,36 +39,35 @@ function TabBar({ active, onChange, counts }: {
   onChange: (t: ResultTab) => void;
   counts: Partial<Record<ResultTab, number>>;
 }) {
-  const tabs: { id: ResultTab; label: string; icon: string }[] = [
-    { id: "overview",     label: "Overview",    icon: "🗺️" },
-    { id: "cuts",         label: "Best cuts",   icon: "✂️" },
-    { id: "shotplan",     label: "Shot plan",   icon: "🎬" },
-    { id: "voiceover",    label: "Voiceover",   icon: "🎙️" },
-    { id: "alternatives", label: "Similar",     icon: "🎵" },
+  const tabs: { id: ResultTab; label: string }[] = [
+    { id: "overview",     label: "OVERVIEW"  },
+    { id: "cuts",         label: "BEST CUTS" },
+    { id: "shotplan",     label: "SHOT PLAN" },
+    { id: "voiceover",    label: "VOICEOVER" },
+    { id: "alternatives", label: "SIMILAR"   },
   ];
 
   return (
-    <div className="flex gap-1 overflow-x-auto pb-1 mb-6">
+    <div className="flex gap-1 overflow-x-auto pb-1 mb-6 border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
       {tabs.map((tab) => {
         const count = counts[tab.id];
+        const isActive = active === tab.id;
         return (
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
-              active === tab.id
-                ? "border-violet-500/50 bg-violet-500/15 text-violet-200"
-                : "border-white/[0.07] bg-white/[0.02] text-white/35 hover:text-white/60 hover:border-white/15"
-            }`}
+            className="relative shrink-0 px-4 py-3 font-display text-sm uppercase transition-colors"
+            style={{ color: isActive ? "#CCFF00" : "rgba(255,255,255,0.3)", letterSpacing: "0.05em" }}
           >
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
+            {tab.label}
             {count !== undefined && count > 0 && (
-              <span className={`rounded-full px-1.5 text-[9px] font-extrabold ${
-                active === tab.id ? "bg-violet-400/20 text-violet-300" : "bg-white/10 text-white/30"
-              }`}>
+              <span className="ml-1.5 font-body text-[10px] font-bold"
+                style={{ color: isActive ? "#CCFF00" : "rgba(255,255,255,0.2)" }}>
                 {count}
               </span>
+            )}
+            {isActive && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: "#CCFF00" }} />
             )}
           </button>
         );
@@ -101,32 +86,31 @@ function HookWindowHero({ hookWindow }: { hookWindow: SongAnalysisResult["hookWi
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-pink-500/20 bg-black/30 p-6"
-      style={{ boxShadow: "0 0 60px rgba(236,72,153,0.08)" }}>
-      <div className="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none"
-        style={{ background: "linear-gradient(to left, rgba(236,72,153,0.06), transparent)" }} />
-
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-pink-400/60 mb-3">Best opening moment</p>
-
+    <div className="border-2 p-5" style={{ borderColor: "#FF007F", background: "rgba(255,0,127,0.05)" }}>
+      <p className="font-body font-bold text-xs uppercase tracking-[0.2em] mb-3"
+        style={{ color: "rgba(255,0,127,0.6)" }}>
+        BEST OPENING MOMENT
+      </p>
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <p className="font-mono text-4xl font-black text-pink-200 leading-none">
+          <p className="font-display text-4xl leading-none" style={{ color: "#FF007F" }}>
             {hookWindow.range.start}
-            <span className="text-pink-400/40 mx-3 font-light">—</span>
+            <span className="mx-3 font-body font-light" style={{ color: "rgba(255,0,127,0.3)" }}>—</span>
             {hookWindow.range.end}
           </p>
-          <p className="mt-3 text-sm leading-6 text-white/55 max-w-lg">{hookWindow.reason}</p>
+          <p className="mt-3 text-sm leading-6" style={{ color: "rgba(255,255,255,0.5)" }}>
+            {hookWindow.reason}
+          </p>
         </div>
-
         <button onClick={copy}
-          className="shrink-0 rounded-xl border px-4 py-2 text-sm font-bold transition-all"
+          className="shrink-0 font-body font-bold text-xs uppercase tracking-widest px-4 py-2 transition-all"
           style={{
-            borderColor: copied ? "rgba(236,72,153,0.5)" : "rgba(236,72,153,0.2)",
-            background: copied ? "rgba(236,72,153,0.1)" : "transparent",
-            color: copied ? "#f9a8d4" : "rgba(236,72,153,0.6)",
+            border: `2px solid ${copied ? "#FF007F" : "rgba(255,0,127,0.3)"}`,
+            background: copied ? "#FF007F" : "transparent",
+            color: copied ? "#000" : "rgba(255,0,127,0.7)",
           }}
         >
-          {copied ? "✓ Copied!" : "Copy timestamp"}
+          {copied ? "✓ COPIED" : "COPY TIMESTAMP"}
         </button>
       </div>
     </div>
@@ -135,34 +119,37 @@ function HookWindowHero({ hookWindow }: { hookWindow: SongAnalysisResult["hookWi
 
 function EnergyMap({ moodShifts }: { moodShifts: SongAnalysisResult["moodShifts"] }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {moodShifts.map((shift, i) => {
-        const dot = INTENSITY_DOT[shift.intensity] ?? "#8b5cf6";
+        const col = INTENSITY_COLOR[shift.intensity] ?? "#CCFF00";
         return (
           <motion.div
             key={`${shift.time}-${i}`}
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="group flex gap-4 items-start rounded-2xl border border-white/[0.06] bg-black/20 p-4 hover:border-white/10 transition-colors"
+            className="flex gap-4 items-start p-4 transition-all"
+            style={{ border: "2px solid rgba(255,255,255,0.05)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = col + "30")}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)")}
           >
-            {/* Timeline dot */}
-            <div className="flex flex-col items-center gap-1 shrink-0">
-              <div className="w-2.5 h-2.5 rounded-full mt-0.5" style={{ background: dot, boxShadow: `0 0 8px ${dot}` }} />
-              {i < moodShifts.length - 1 && <div className="flex-1 w-px bg-white/[0.06] mt-1 min-h-8" />}
+            <div className="flex flex-col items-center gap-1 shrink-0 pt-1">
+              <div className="w-2 h-2" style={{ background: col, boxShadow: `0 0 8px ${col}` }} />
+              {i < moodShifts.length - 1 && <div className="flex-1 w-px min-h-6" style={{ background: "rgba(255,255,255,0.08)" }} />}
             </div>
-
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <p className="text-sm font-semibold text-white">{shift.label}</p>
+                <p className="font-body font-bold text-sm text-white">{shift.label}</p>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${INTENSITY_STYLE[shift.intensity] ?? ""}`}>
-                    {shift.intensity === "low" ? "Calm" : shift.intensity === "medium" ? "Building" : "Peak"}
+                  <span className="font-body font-bold text-[10px] uppercase px-2 py-0.5"
+                    style={{ background: col + "20", color: col, border: `1px solid ${col}40` }}>
+                    {INTENSITY_LABEL[shift.intensity] ?? shift.intensity}
                   </span>
-                  <span className="font-mono text-xs text-white/30">{shift.time}</span>
+                  <span className="font-body text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    {shift.time}
+                  </span>
                 </div>
               </div>
-              <p className="text-xs leading-5 text-white/50">{shift.description}</p>
+              <p className="text-xs leading-5" style={{ color: "rgba(255,255,255,0.45)" }}>{shift.description}</p>
             </div>
           </motion.div>
         );
@@ -181,23 +168,23 @@ function SceneFits({ sceneFits }: { sceneFits: SongAnalysisResult["sceneFits"] }
           <motion.div key={`${scene.category}-${i}`}
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
-            className="rounded-2xl border border-purple-500/15 bg-purple-500/[0.04] p-4">
+            className="p-4" style={{ border: "2px solid rgba(204,255,0,0.1)" }}>
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2">
                 <span>{icon}</span>
-                <p className="text-sm font-semibold text-white">
+                <p className="font-body font-bold text-sm text-white">
                   {formatSceneFitCategory(scene.category as never)}
                 </p>
               </div>
-              <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs font-bold text-purple-300">
-                {pct}%
-              </span>
+              <span className="font-display text-sm" style={{ color: "#CCFF00" }}>{pct}%</span>
             </div>
-            <div className="mb-2 h-1 rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-purple-500 opacity-60" style={{ width: `${pct}%` }} />
+            <div className="mb-2 h-0.5 w-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+              <div className="h-full" style={{ width: `${pct}%`, background: "#CCFF00", opacity: 0.7 }} />
             </div>
-            <p className="text-[10px] text-purple-300/50 mb-1 font-mono">{scene.bestRange.start} — {scene.bestRange.end}</p>
-            <p className="text-xs leading-5 text-white/50">{scene.reason}</p>
+            <p className="font-body text-[10px] mb-1" style={{ color: "rgba(204,255,0,0.4)" }}>
+              {scene.bestRange.start} — {scene.bestRange.end}
+            </p>
+            <p className="font-body text-xs leading-5" style={{ color: "rgba(255,255,255,0.45)" }}>{scene.reason}</p>
           </motion.div>
         );
       })}
@@ -208,57 +195,64 @@ function SceneFits({ sceneFits }: { sceneFits: SongAnalysisResult["sceneFits"] }
 export function AnalysisResult({ result }: AnalysisResultProps) {
   const [tab, setTab] = useState<ResultTab>("overview");
 
-  const platformBadge = PLATFORM_BADGE[result.platform] ?? "border-white/10 bg-white/5 text-white/60";
   const preset = result.preset ?? "general";
   const presetMeta = PRESET_OPTIONS.find((p) => p.id === preset);
 
   return (
-    <div className="space-y-2">
-      {/* ── Song header card ── */}
-      <div className="rounded-3xl border border-white/[0.07] bg-black/30 overflow-hidden">
+    <div className="space-y-3">
+      {/* ── Song header ── */}
+      <div className="border-2 overflow-hidden" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
         <div className="flex gap-5 p-5 flex-col sm:flex-row">
-          {/* Thumbnail */}
           {result.thumbnailUrl ? (
-            <div className="shrink-0 overflow-hidden rounded-2xl border border-white/10 w-full sm:w-32 h-32 sm:h-auto">
+            <div className="shrink-0 overflow-hidden w-full sm:w-32 h-28 sm:h-auto"
+              style={{ border: "2px solid rgba(255,255,255,0.1)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={result.thumbnailUrl} alt={result.songTitle}
                 className="w-full h-full object-cover" />
             </div>
           ) : (
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-white/10 text-3xl">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center text-3xl"
+              style={{ background: "rgba(204,255,0,0.08)", border: "2px solid rgba(204,255,0,0.15)" }}>
               🎵
             </div>
           )}
 
-          {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap gap-2 mb-3">
-              <span className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${platformBadge}`}>
+              <span className="font-body font-bold text-xs uppercase tracking-widest px-2.5 py-0.5"
+                style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)" }}>
                 {formatPlatform(result.platform)}
               </span>
               {presetMeta && (
-                <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-medium text-white/50">
+                <span className="font-body font-bold text-xs uppercase tracking-widest px-2.5 py-0.5"
+                  style={{ border: "1px solid rgba(204,255,0,0.2)", color: "rgba(204,255,0,0.6)" }}>
                   {presetMeta.icon} {presetMeta.label}
                 </span>
               )}
             </div>
-            <h3 className="font-display text-xl font-extrabold text-white leading-tight">{result.songTitle}</h3>
-            <p className="text-sm text-white/45 mt-0.5">{result.artistName}</p>
-            <p className="mt-3 text-sm leading-6 text-white/55">{result.summary}</p>
+            <h3 className="font-display text-2xl uppercase text-white leading-tight"
+              style={{ letterSpacing: "-0.01em" }}>
+              {result.songTitle}
+            </h3>
+            <p className="font-body text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+              {result.artistName}
+            </p>
+            <p className="font-body mt-3 text-sm leading-6" style={{ color: "rgba(255,255,255,0.5)" }}>
+              {result.summary}
+            </p>
           </div>
         </div>
 
-        {/* Hook window hero — always visible at top */}
+        {/* Hook window */}
         <div className="px-5 pb-5">
           <HookWindowHero hookWindow={result.hookWindow} />
         </div>
       </div>
 
-      {/* ── Tab navigation ── */}
-      <div className="rounded-3xl border border-white/[0.07] bg-black/20 p-5">
+      {/* ── Tabbed detail panel ── */}
+      <div className="border-2 p-5" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
         <TabBar
-          active={tab}
-          onChange={setTab}
+          active={tab} onChange={setTab}
           counts={{
             cuts: result.bestCuts?.length ?? 0,
             shotplan: result.shotPlan?.length ?? 0,
@@ -273,18 +267,23 @@ export function AnalysisResult({ result }: AnalysisResultProps) {
             transition={{ duration: 0.2 }}>
 
             {tab === "overview" && (
-              <div className="space-y-6">
-                {/* Energy map */}
+              <div className="space-y-8">
                 <div>
-                  <h3 className="font-display text-lg font-extrabold text-white mb-1">Energy map</h3>
-                  <p className="text-xs text-white/35 mb-4">How the song's energy changes over time.</p>
+                  <h3 className="font-display text-xl uppercase text-white mb-1" style={{ letterSpacing: "0.02em" }}>
+                    ENERGY MAP
+                  </h3>
+                  <p className="font-body text-xs mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    HOW THE SONG&apos;S ENERGY CHANGES OVER TIME.
+                  </p>
                   <EnergyMap moodShifts={result.moodShifts} />
                 </div>
-
-                {/* Scene fits */}
                 <div>
-                  <h3 className="font-display text-lg font-extrabold text-white mb-1">Best use cases</h3>
-                  <p className="text-xs text-white/35 mb-4">What type of video this song works best for.</p>
+                  <h3 className="font-display text-xl uppercase text-white mb-1" style={{ letterSpacing: "0.02em" }}>
+                    BEST USE CASES
+                  </h3>
+                  <p className="font-body text-xs mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    WHAT TYPE OF VIDEO THIS SONG WORKS BEST FOR.
+                  </p>
                   <SceneFits sceneFits={result.sceneFits} />
                 </div>
               </div>
@@ -300,32 +299,38 @@ export function AnalysisResult({ result }: AnalysisResultProps) {
 
             {tab === "voiceover" && (
               <div>
-                <h3 className="font-display text-lg font-extrabold text-white mb-1">Voiceover windows</h3>
-                <p className="text-xs text-white/35 mb-4">
-                  Where you can narrate without the music competing.
+                <h3 className="font-display text-xl uppercase text-white mb-1" style={{ letterSpacing: "0.02em" }}>
+                  VOICEOVER WINDOWS
+                </h3>
+                <p className="font-body text-xs mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  WHERE YOU CAN NARRATE WITHOUT THE MUSIC COMPETING.
                 </p>
-                <div className="mb-3 flex gap-4 text-[10px] font-bold text-white/30 flex-wrap">
-                  <span className="text-green-400">● Great for talking</span>
-                  <span className="text-amber-400">● Could work</span>
-                  <span className="text-red-400">● Music may compete</span>
+                <div className="mb-4 flex gap-4 text-[10px] font-bold flex-wrap">
+                  <span style={{ color: "#CCFF00" }}>● GREAT</span>
+                  <span style={{ color: "#FFB800" }}>● COULD WORK</span>
+                  <span style={{ color: "#FF003C" }}>● RISKY</span>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {result.voiceoverSafeSections.map((section, i) => {
                     const safety = section.safetyLevel ?? "okay";
+                    const col = SAFETY_COLOR[safety] ?? "#CCFF00";
                     return (
                       <motion.div key={i}
                         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.07 }}
-                        className="rounded-2xl border border-white/[0.08] bg-black/20 p-5">
+                        className="p-5" style={{ border: `2px solid ${col}20` }}>
                         <div className="flex items-center justify-between gap-3 mb-2">
-                          <p className="font-mono text-xl font-bold text-emerald-300">
+                          <p className="font-display text-xl" style={{ color: col }}>
                             {section.range.start} — {section.range.end}
                           </p>
-                          <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${SAFETY_STYLE[safety] ?? SAFETY_STYLE.okay}`}>
+                          <span className="font-body font-bold text-[10px] uppercase tracking-widest px-2.5 py-1"
+                            style={{ background: col + "20", color: col, border: `1px solid ${col}40` }}>
                             {SAFETY_LABEL[safety] ?? safety}
                           </span>
                         </div>
-                        <p className="text-xs leading-5 text-white/55">{section.reason}</p>
+                        <p className="font-body text-xs leading-5" style={{ color: "rgba(255,255,255,0.5)" }}>
+                          {section.reason}
+                        </p>
                       </motion.div>
                     );
                   })}
@@ -335,27 +340,33 @@ export function AnalysisResult({ result }: AnalysisResultProps) {
 
             {tab === "alternatives" && (
               <div>
-                <h3 className="font-display text-lg font-extrabold text-white mb-1">Similar tracks to try</h3>
-                <p className="text-xs text-white/35 mb-4">
-                  If this song doesn't fit — free-to-use tracks in the same creative direction.
+                <h3 className="font-display text-xl uppercase text-white mb-1" style={{ letterSpacing: "0.02em" }}>
+                  SIMILAR TRACKS TO TRY
+                </h3>
+                <p className="font-body text-xs mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  FREE-TO-USE TRACKS IN THE SAME CREATIVE DIRECTION.
                 </p>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {result.alternatives.map((track, i) => (
                     <motion.div key={i}
                       initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.07 }}
-                      className="rounded-2xl border border-pink-500/15 bg-pink-500/[0.04] p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-sm">
-                          🎵
-                        </div>
-                        <div>
-                          <p className="font-display text-sm font-bold text-white leading-tight">{track.title}</p>
-                          <p className="text-[10px] text-pink-300/70">{track.artist}</p>
-                        </div>
-                      </div>
-                      <p className="text-[10px] font-semibold text-white/30 mb-2">{track.source}</p>
-                      <p className="text-xs leading-5 text-white/50">{track.reason}</p>
+                      className="p-4" style={{ border: "2px solid rgba(255,0,127,0.15)" }}>
+                      <div className="text-2xl mb-2">🎵</div>
+                      <p className="font-display text-base uppercase text-white leading-tight mb-1"
+                        style={{ letterSpacing: "0.01em" }}>
+                        {track.title}
+                      </p>
+                      <p className="font-body text-xs mb-1" style={{ color: "rgba(255,0,127,0.7)" }}>
+                        {track.artist}
+                      </p>
+                      <p className="font-body font-bold text-[10px] uppercase mb-2"
+                        style={{ color: "rgba(255,255,255,0.2)" }}>
+                        {track.source}
+                      </p>
+                      <p className="font-body text-xs leading-5" style={{ color: "rgba(255,255,255,0.45)" }}>
+                        {track.reason}
+                      </p>
                     </motion.div>
                   ))}
                 </div>

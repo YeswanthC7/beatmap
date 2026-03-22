@@ -113,6 +113,17 @@ backend/
 
 SQLite at `beatmap.db` (configurable via `DB_PATH` env var). Auto-created + migrated on startup. Includes `preset` column.
 
+## Design System (Current)
+
+**Web3 Brutalist** — fully replaced the previous premium dark UI.
+
+- **Fonts**: Anton (display/headings) + Space Grotesk (body) via Google Fonts
+- **Palette**: `#0B0C10` bg, `#CCFF00` neon, `#FF007F` pink, `#FF003C` red, `#66FCF1` cyan
+- **Key patterns**: glitch text animation (clip-path strips), uppercase Anton headings, hard-edged 2px borders (no border-radius on panels), `mix-blend-mode: difference` nav, neon marquee strip, clip-path slant faction panels
+- **New `bm-*` components**: `bm-loader`, `bm-nav`, `bm-progress`, `bm-hero`, `bm-factions`, `bm-analyze`, `bm-trending`, `bm-faq`, `bm-footer`
+- All result components (`analysis-result`, `best-cuts-section`, `shot-plan-section`, `compare-tracks`) restyled to match
+- `globals.css` fully replaced — no more purple/glass variables
+
 ## Workflows
 
 - **Start application** — `cd frontend && npm run dev` (port 5000, webview)
