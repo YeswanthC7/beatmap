@@ -90,17 +90,29 @@ def _get_client():
 MODEL = "gemini-2.0-flash-lite"
 
 
+def _is_quota_error(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    return "quota" in msg or "429" in msg or "resource_exhausted" in msg
+
+
 async def analyse_song_from_metadata(
     title: str,
     artist: str,
     platform: str,
     source_label: str,
-) -> dict | None:
-    """Use Gemini to generate scene analysis based on song metadata."""
+) -> tuple[dict | None, str]:
+    """Use Gemini to generate scene analysis based on song metadata.
+
+    Returns (result_dict, failure_reason) where failure_reason is one of:
+      "" — success
+      "no_key" — GEMINI_API_KEY not configured
+      "quota" — API quota exhausted
+      "error" — other failure
+    """
     client = _get_client()
     if client is None:
-        logger.info("Gemini unavailable — skipping metadata analysis")
-        return None
+        logger.info("Gemini unavailable — no API key configured")
+        return None, "no_key"
 
     prompt = f"""You are a professional music supervisor creating scene-fit analysis for film and video production.
 
@@ -128,10 +140,13 @@ Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
             config={"response_mime_type": "application/json"},
         )
         data = _parse_json_response(response.text)
-        return _normalize_analysis(data)
+        return _normalize_analysis(data), ""
     except Exception as exc:
+        if _is_quota_error(exc):
+            logger.warning("Gemini quota exceeded: %s", exc)
+            return None, "quota"
         logger.error("Gemini metadata analysis failed: %s", exc)
-        return None
+        return None, "error"
 
 
 async def analyse_audio_file(audio_path: Path, duration_seconds: float) -> dict | None:

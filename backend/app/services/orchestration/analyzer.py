@@ -32,51 +32,58 @@ def _build_source_label(url: str) -> str:
     return f"{domain}{path}{query}"
 
 
+_FALLBACK_REASONS = {
+    "no_key": "AI scene analysis requires a GEMINI_API_KEY — add it in Secrets to enable full intelligence.",
+    "quota": "Gemini API free-tier quota is exhausted for today. Analysis will resume when the quota resets (daily at midnight Pacific time).",
+    "error": "Gemini AI returned an unexpected error. Metadata was fetched successfully; try again shortly.",
+}
+
+
 def _fallback_analysis(
     title: str,
     artist: str,
-    platform: str,
-    mode: AnalysisMode,
+    failure_reason: str = "no_key",
 ) -> dict:
     """Return honest placeholder analysis when AI is unavailable."""
+    reason_msg = _FALLBACK_REASONS.get(failure_reason, _FALLBACK_REASONS["error"])
+    short = "AI scene analysis temporarily unavailable" if failure_reason == "quota" else "AI scene analysis unavailable"
+
     return {
         "summary": (
-            f'"{title}" by {artist} — metadata retrieved successfully. '
-            "AI-generated scene analysis is unavailable (no Gemini API key configured). "
-            "Configure GEMINI_API_KEY to unlock full scene intelligence."
+            f'Metadata retrieved successfully. {reason_msg}'
         ),
         "moodShifts": [
             {
                 "time": "00:00",
-                "label": "Opening",
+                "label": short,
                 "intensity": "low",
-                "description": "AI analysis unavailable — configure GEMINI_API_KEY for real mood shift detection.",
+                "description": reason_msg,
             }
         ],
         "hookWindow": {
             "range": {"start": "00:00", "end": "00:30"},
-            "reason": "AI analysis unavailable — real hook detection requires GEMINI_API_KEY.",
+            "reason": reason_msg,
         },
         "voiceoverSafeSections": [
             {
                 "range": {"start": "00:00", "end": "00:30"},
-                "reason": "AI analysis unavailable — configure GEMINI_API_KEY for real voiceover detection.",
+                "reason": reason_msg,
             }
         ],
         "sceneFits": [
             {
                 "category": "montage",
                 "confidence": 0.5,
-                "reason": "Placeholder — AI analysis unavailable. Add GEMINI_API_KEY for real scene-fit scoring.",
+                "reason": reason_msg,
                 "bestRange": {"start": "00:00", "end": "00:30"},
             }
         ],
         "alternatives": [
             {
-                "title": "AI recommendations unavailable",
+                "title": short,
                 "artist": "—",
-                "source": "Configure GEMINI_API_KEY",
-                "reason": "Alternative track recommendations require Gemini AI to be configured.",
+                "source": "Gemini AI",
+                "reason": reason_msg,
             }
         ],
     }
@@ -191,7 +198,7 @@ async def analyse_link(url: str) -> SongAnalysisResult:
 
     logger.info("Analysing '%s' by %s [%s] — metadata_only mode", song_title, artist_name, platform)
 
-    ai = await analyse_song_from_metadata(
+    ai, failure_reason = await analyse_song_from_metadata(
         title=song_title,
         artist=artist_name,
         platform=platform,
@@ -199,7 +206,7 @@ async def analyse_link(url: str) -> SongAnalysisResult:
     )
 
     if ai is None:
-        ai = _fallback_analysis(song_title, artist_name, platform, "metadata_only")
+        ai = _fallback_analysis(song_title, artist_name, failure_reason)
 
     result = _build_result(
         song_title=song_title,
