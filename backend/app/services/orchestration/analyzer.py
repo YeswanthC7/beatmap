@@ -34,7 +34,7 @@ def _build_source_label(url: str) -> str:
 
 _FALLBACK_REASONS = {
     "no_key": "AI scene analysis requires an API key — add GROQ_API_KEY or GEMINI_API_KEY in Secrets to enable full intelligence.",
-    "quota": "AI API quota is exhausted for today. Analysis will resume when the quota resets (daily at midnight Pacific time).",
+    "quota": "AI API rate limit or quota is exhausted. Please try again in a few minutes.",
     "error": "AI returned an unexpected error. Metadata was fetched successfully; try again shortly.",
 }
 
@@ -82,7 +82,7 @@ def _fallback_analysis(
             {
                 "title": short,
                 "artist": "—",
-                "source": "Gemini AI",
+                "source": "AI analysis unavailable",
                 "reason": reason_msg,
             }
         ],
