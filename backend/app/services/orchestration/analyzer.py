@@ -1,0 +1,264 @@
+import logging
+from pathlib import Path
+from urllib.parse import urlparse
+
+from app.api.link_utils import detect_platform
+from app.api.schemas import (
+    AlternativeTrack,
+    AnalysisMode,
+    HookWindow,
+    MoodShift,
+    SceneFitSuggestion,
+    SongAnalysisResult,
+    TimeRange,
+    VoiceoverSafeSection,
+)
+from app.api.soundcloud_utils import extract_soundcloud_path
+from app.api.youtube_utils import extract_youtube_video_id
+from app.services.audio.processor import get_audio_duration
+from app.services.gemini.client import analyse_audio_file, analyse_song_from_metadata
+from app.services.metadata.soundcloud import fetch_soundcloud_metadata
+from app.services.metadata.youtube import fetch_youtube_metadata
+from app.services.persistence.db import save_analysis
+
+logger = logging.getLogger(__name__)
+
+
+def _build_source_label(url: str) -> str:
+    parsed = urlparse(url)
+    domain = parsed.netloc.replace("www.", "")
+    path = parsed.path or "/"
+    query = f"?{parsed.query}" if parsed.query else ""
+    return f"{domain}{path}{query}"
+
+
+def _fallback_analysis(
+    title: str,
+    artist: str,
+    platform: str,
+    mode: AnalysisMode,
+) -> dict:
+    """Return honest placeholder analysis when AI is unavailable."""
+    return {
+        "summary": (
+            f'"{title}" by {artist} — metadata retrieved successfully. '
+            "AI-generated scene analysis is unavailable (no Gemini API key configured). "
+            "Configure GEMINI_API_KEY to unlock full scene intelligence."
+        ),
+        "moodShifts": [
+            {
+                "time": "00:00",
+                "label": "Opening",
+                "intensity": "low",
+                "description": "AI analysis unavailable — configure GEMINI_API_KEY for real mood shift detection.",
+            }
+        ],
+        "hookWindow": {
+            "range": {"start": "00:00", "end": "00:30"},
+            "reason": "AI analysis unavailable — real hook detection requires GEMINI_API_KEY.",
+        },
+        "voiceoverSafeSections": [
+            {
+                "range": {"start": "00:00", "end": "00:30"},
+                "reason": "AI analysis unavailable — configure GEMINI_API_KEY for real voiceover detection.",
+            }
+        ],
+        "sceneFits": [
+            {
+                "category": "montage",
+                "confidence": 0.5,
+                "reason": "Placeholder — AI analysis unavailable. Add GEMINI_API_KEY for real scene-fit scoring.",
+                "bestRange": {"start": "00:00", "end": "00:30"},
+            }
+        ],
+        "alternatives": [
+            {
+                "title": "AI recommendations unavailable",
+                "artist": "—",
+                "source": "Configure GEMINI_API_KEY",
+                "reason": "Alternative track recommendations require Gemini AI to be configured.",
+            }
+        ],
+    }
+
+
+def _build_result(
+    *,
+    song_title: str,
+    artist_name: str,
+    source: str,
+    source_label: str,
+    platform: str,
+    analysis_mode: AnalysisMode,
+    youtube_video_id: str | None,
+    soundcloud_path: str | None,
+    thumbnail_url: str | None,
+    ai: dict,
+) -> SongAnalysisResult:
+    def tr(d: dict) -> TimeRange:
+        return TimeRange(start=d.get("start", "00:00"), end=d.get("end", "00:30"))
+
+    mood_shifts = [
+        MoodShift(
+            time=ms.get("time", "00:00"),
+            label=ms.get("label", ""),
+            intensity=ms.get("intensity", "medium"),
+            description=ms.get("description", ""),
+        )
+        for ms in ai.get("moodShifts", [])
+    ]
+
+    hook_raw = ai.get("hookWindow", {})
+    hook_window = HookWindow(
+        range=tr(hook_raw.get("range", {})),
+        reason=hook_raw.get("reason", ""),
+    )
+
+    voiceover = [
+        VoiceoverSafeSection(
+            range=tr(vs.get("range", {})),
+            reason=vs.get("reason", ""),
+        )
+        for vs in ai.get("voiceoverSafeSections", [])
+    ]
+
+    scene_fits = [
+        SceneFitSuggestion(
+            category=sf.get("category", "montage"),
+            confidence=float(sf.get("confidence", 0.75)),
+            reason=sf.get("reason", ""),
+            bestRange=tr(sf.get("bestRange", {})),
+        )
+        for sf in ai.get("sceneFits", [])
+    ]
+
+    alternatives = [
+        AlternativeTrack(
+            title=alt.get("title", ""),
+            artist=alt.get("artist", ""),
+            source=alt.get("source", ""),
+            reason=alt.get("reason", ""),
+        )
+        for alt in ai.get("alternatives", [])
+    ]
+
+    return SongAnalysisResult(
+        songTitle=song_title,
+        artistName=artist_name,
+        source=source,
+        sourceLabel=source_label,
+        platform=platform,
+        analysisMode=analysis_mode,
+        youtubeVideoId=youtube_video_id,
+        soundcloudPath=soundcloud_path,
+        thumbnailUrl=thumbnail_url,
+        summary=ai.get("summary", ""),
+        moodShifts=mood_shifts,
+        hookWindow=hook_window,
+        voiceoverSafeSections=voiceover,
+        sceneFits=scene_fits,
+        alternatives=alternatives,
+    )
+
+
+async def analyse_link(url: str) -> SongAnalysisResult:
+    """Full pipeline for link-based analysis (YouTube or SoundCloud)."""
+    source_label = _build_source_label(url)
+    platform = detect_platform(url)
+
+    song_title = "Unknown Song"
+    artist_name = "Unknown Artist"
+    thumbnail_url = None
+    youtube_video_id = None
+    soundcloud_path = None
+
+    if platform == "youtube":
+        youtube_video_id = extract_youtube_video_id(url)
+        if youtube_video_id:
+            meta = await fetch_youtube_metadata(youtube_video_id)
+            if meta:
+                song_title = meta.title
+                artist_name = meta.channel_title
+                thumbnail_url = meta.thumbnail_url
+
+    elif platform == "soundcloud":
+        soundcloud_path = extract_soundcloud_path(url)
+        meta = await fetch_soundcloud_metadata(url)
+        if meta:
+            song_title = meta.title
+            artist_name = meta.artist
+            thumbnail_url = meta.thumbnail_url
+
+    logger.info("Analysing '%s' by %s [%s] — metadata_only mode", song_title, artist_name, platform)
+
+    ai = await analyse_song_from_metadata(
+        title=song_title,
+        artist=artist_name,
+        platform=platform,
+        source_label=source_label,
+    )
+
+    if ai is None:
+        ai = _fallback_analysis(song_title, artist_name, platform, "metadata_only")
+
+    result = _build_result(
+        song_title=song_title,
+        artist_name=artist_name,
+        source="link",
+        source_label=source_label,
+        platform=platform,
+        analysis_mode="metadata_only",
+        youtube_video_id=youtube_video_id,
+        soundcloud_path=soundcloud_path,
+        thumbnail_url=thumbnail_url,
+        ai=ai,
+    )
+
+    record_id = await save_analysis(result)
+    return result.model_copy(update={"id": record_id})
+
+
+async def analyse_audio_upload(
+    audio_bytes: bytes,
+    filename: str,
+    original_filename: str = "recording",
+) -> SongAnalysisResult:
+    """Full pipeline for uploaded/recorded audio analysis."""
+    import tempfile
+    from app.services.audio.processor import cleanup_temp, save_upload_to_temp
+
+    suffix = Path(filename).suffix or ".webm"
+    audio_path = save_upload_to_temp(audio_bytes, suffix=suffix)
+
+    try:
+        duration = get_audio_duration(audio_path) or 30.0
+        logger.info("Audio upload: file=%s size=%d duration=%.1fs", filename, len(audio_bytes), duration)
+
+        ai = await analyse_audio_file(audio_path, duration)
+
+        if ai is None:
+            ai = _fallback_analysis("Recorded Audio", "Unknown Artist", "mic", "recorded_audio")
+            ai["summary"] = (
+                f"Recorded audio clip (~{duration:.0f}s) received. "
+                "AI analysis is unavailable (no Gemini API key). "
+                "Configure GEMINI_API_KEY to enable real audio intelligence."
+            )
+
+        result = _build_result(
+            song_title="Recorded Audio",
+            artist_name="Mic Recording",
+            source="mic",
+            source_label=f"mic/{original_filename}",
+            platform="mic",
+            analysis_mode="recorded_audio",
+            youtube_video_id=None,
+            soundcloud_path=None,
+            thumbnail_url=None,
+            ai=ai,
+        )
+
+        record_id = await save_analysis(result)
+        return result.model_copy(update={"id": record_id})
+
+    finally:
+        cleanup_temp(audio_path)

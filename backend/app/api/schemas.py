@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, HttpUrl
 
 
@@ -13,7 +15,7 @@ class TimeRange(BaseModel):
 class MoodShift(BaseModel):
     time: str
     label: str
-    intensity: str
+    intensity: Literal["low", "medium", "high"]
     description: str
 
 
@@ -41,12 +43,17 @@ class AlternativeTrack(BaseModel):
     reason: str
 
 
+AnalysisMode = Literal["metadata_only", "recorded_audio"]
+
+
 class SongAnalysisResult(BaseModel):
+    id: str | None = None
     songTitle: str
     artistName: str
     source: str
     sourceLabel: str
     platform: str
+    analysisMode: AnalysisMode = "metadata_only"
     youtubeVideoId: str | None = None
     soundcloudPath: str | None = None
     thumbnailUrl: str | None = None
@@ -56,3 +63,23 @@ class SongAnalysisResult(BaseModel):
     voiceoverSafeSections: list[VoiceoverSafeSection]
     hookWindow: HookWindow
     alternatives: list[AlternativeTrack]
+
+
+class AnalysisRecord(BaseModel):
+    id: str
+    createdAt: str
+    platform: str
+    sourceLabel: str
+    songTitle: str
+    artistName: str
+    thumbnailUrl: str | None = None
+    analysisMode: AnalysisMode
+
+
+class AnalysisListResponse(BaseModel):
+    analyses: list[AnalysisRecord]
+
+
+class DeleteResponse(BaseModel):
+    success: bool
+    id: str

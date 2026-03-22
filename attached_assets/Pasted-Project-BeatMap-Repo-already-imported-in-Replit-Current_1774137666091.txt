@@ -1,0 +1,510 @@
+Project: BeatMap
+Repo: already imported in Replit
+Current stack:
+- Frontend: Next.js + React + TypeScript + Tailwind
+- Backend: FastAPI + Python
+- Existing status:
+  - frontend exists and renders the BeatMap dashboard UI
+  - backend exists with /health and /api/analyze/link
+  - YouTube/SoundCloud platform detection exists
+  - YouTube video ID extraction exists
+  - SoundCloud path extraction exists
+  - real YouTube metadata fetch already exists
+  - frontend currently still uses mockAnalysis or is only partially wired
+  - Replit workflows are already set up
+  - YOUTUBE_API_KEY is already configured
+Goal:
+Implement the remaining phases end-to-end in this repo with production-minded structure, clean code, and working UI/UX.
+
+CRITICAL GEMINI INSTRUCTION
+Wherever Gemini is needed, do NOT assume the user’s Google AI Pro subscription alone can be used directly by the app backend. Implement Gemini usage through the official Gemini API using a Replit secret:
+- preferred secret name: GEMINI_API_KEY
+- also support GOOGLE_API_KEY if present
+- use server-side Gemini only; never expose the key in browser code
+- use the official Google GenAI SDK in Python
+- default to a cost-conscious model for frequent/fast tasks
+- reserve stronger reasoning models only where they materially improve final quality
+- if the secret is missing, the app must still run and clearly degrade to non-Gemini fallback behavior instead of crashing
+
+NON-NEGOTIABLES
+1. Inspect the current repo first and preserve existing working behavior unless replacing placeholder behavior with real behavior.
+2. Do not break YouTube metadata fetching that already works.
+3. Keep the codebase clean and modular. Avoid giant files.
+4. Keep the existing UI style polished and portfolio-grade.
+5. Any backend route should return structured, typed JSON responses only.
+6. Add validation, loading, empty, and error states throughout.
+7. Prefer transparent fallback behavior over fake or misleading AI output.
+8. If full audio analysis from arbitrary external links is not technically supported in this environment, implement an honest best-effort pipeline and show clear messaging in the UI. Do not fake deep timestamped analysis when the underlying audio was unavailable.
+9. Do all code changes directly in the repo and make the project runnable in Replit.
+10. At the end, give me:
+   - a concise summary of what changed
+   - any new secrets needed
+   - exact run/test instructions
+   - a suggested git commit message
+
+OVERALL PRODUCT TARGET
+BeatMap should become a portfolio-grade AI music intelligence app that can:
+- take a YouTube link
+- take a SoundCloud link
+- take live mic/recorded audio
+- produce structured scene-fit intelligence:
+  - timestamped mood shifts
+  - hook window
+  - voiceover-safe sections
+  - scene-fit categories
+  - alternative track suggestions
+- save past analyses so they can be reopened later
+
+IMPLEMENT THE FOLLOWING PHASES
+
+==================================================
+PHASE 1 — FRONTEND LIVE INTEGRATION
+==================================================
+
+Objective:
+Replace mock-only behavior with real backend integration.
+
+Requirements:
+1. Connect the landing page input to POST /api/analyze/link.
+2. Replace mockAnalysis usage with real fetched response data.
+3. Preserve a useful empty/default state before the first analysis.
+4. Add all required UX states:
+   - initial empty state
+   - submitting/loading state
+   - success state
+   - validation error state
+   - API/network failure state
+   - unsupported-link state if needed
+5. Confirm the following fields update live in the UI from backend responses:
+   - thumbnail
+   - title
+   - artist
+   - platform
+   - source label
+   - summary
+   - hook window
+   - mood shifts
+   - scene-fit categories
+   - voiceover-safe sections
+   - alternative tracks
+6. Keep the dashboard visually strong and consistent with the current design language.
+7. If backend is unavailable, show a clear frontend error message rather than silently failing.
+
+Implementation guidance:
+- Refactor page state cleanly; do not keep stale mock data as if it were real results.
+- If useful, create dedicated components for:
+  - input form
+  - status banner
+  - analysis hero card
+  - timeline sections
+  - empty state
+- If current types need tightening, update TypeScript types accordingly.
+- Make sure the page is fully client-safe and works in Replit preview.
+
+Acceptance criteria:
+- Pasting a working YouTube link updates the page with live backend data.
+- Empty and error states are visible and user-friendly.
+- No placeholder/mock data appears after a real request succeeds.
+
+==================================================
+PHASE 2 — SOUNDCLOUD METADATA SUPPORT
+==================================================
+
+Objective:
+Upgrade SoundCloud handling from path parsing only to real metadata retrieval.
+
+Requirements:
+1. Extend backend SoundCloud support to fetch actual metadata when possible:
+   - track title
+   - artist/uploader name
+   - artwork/thumbnail
+   - canonical source label/path
+2. Update backend schemas to support SoundCloud metadata parity with YouTube.
+3. Make the same frontend rendering pipeline work for SoundCloud with no special hacks.
+4. If artwork is unavailable, return null cleanly and let frontend render a graceful fallback.
+5. If SoundCloud metadata retrieval is partially supported or rate-limited, return a transparent summary that explains the limitation.
+
+Implementation guidance:
+- Reuse existing source/platform schema patterns.
+- Add a dedicated SoundCloud client/service module instead of mixing logic directly into routes.
+- Handle invalid and private/unresolvable SoundCloud URLs safely.
+- Keep the API response shape as unified as possible across platforms.
+
+Acceptance criteria:
+- A resolvable SoundCloud link populates title/artist/artwork/platform in the same UI used for YouTube.
+- Unresolvable SoundCloud links fail gracefully with a clear message.
+
+==================================================
+PHASE 3 — REAL AI SCENE INTELLIGENCE
+==================================================
+
+Objective:
+Replace static placeholder scene analysis with real generated output.
+
+Requirements:
+1. Build a real backend analysis service that returns:
+   - timestamped mood shifts
+   - hook window
+   - voiceover-safe sections
+   - scene-fit categories
+   - alternative track suggestions
+   - concise summary
+2. Use Gemini on the backend for reasoning/generation where appropriate.
+3. The output must be structured and validated before being returned to the frontend.
+4. Do not return vague prose blobs; return strongly shaped data that matches frontend schemas.
+5. The analysis should be transparent about what evidence source it used:
+   - metadata only
+   - audio-derived features
+   - transcript/lyrics if available
+   - hybrid
+6. The summary should indicate confidence/limitations when the system lacked direct audio access.
+
+Implementation guidance:
+- Create a dedicated backend analysis module/service layer.
+- Use a schema-first approach:
+  - define Pydantic models for all structured outputs
+  - generate with Gemini
+  - validate and normalize the response
+- Add prompt templates on the backend; do not hardcode brittle logic in routes.
+- Implement post-processing for:
+  - time range normalization
+  - category normalization
+  - deduplication
+  - empty-field handling
+- Distinguish between:
+  - metadata-only intelligence
+  - audio-supported intelligence
+- If the system only had metadata, do not pretend it analyzed the waveform.
+- Add safe defaults and fallback summaries.
+
+Acceptance criteria:
+- API returns genuinely generated, schema-valid analysis objects.
+- Responses differ meaningfully across different inputs.
+- The UI renders all analysis sections from real backend output.
+
+==================================================
+PHASE 4 — AUDIO UNDERSTANDING PIPELINE
+==================================================
+
+Objective:
+Create a credible preprocessing pipeline for timing-aware analysis.
+
+Requirements:
+1. Add a backend pipeline that can process supported audio inputs into analysis-ready signals/features.
+2. Build the pipeline so it can support:
+   - uploaded audio / recorded audio
+   - any legally and technically supported link-derived audio path
+3. Extract/use timing-aware information needed for:
+   - mood segment boundaries
+   - energetic peaks / likely hook region
+   - quieter/sparser windows that may be voiceover-safe
+4. Replace static placeholder timing decisions with pipeline-informed timing decisions wherever audio is actually available.
+5. Keep the code modular so future model/tool upgrades are easy.
+
+Implementation guidance:
+- Create a dedicated backend package for audio processing.
+- Separate stages clearly, for example:
+  - ingestion
+  - normalization
+  - feature extraction
+  - segment proposal
+  - AI interpretation
+  - response assembly
+- Favor robust, well-structured preprocessing over overpromising advanced MIR magic if not fully available.
+- If a source cannot provide actual audio in this environment, record that limitation and continue with metadata-mode analysis instead of failing.
+
+Strong preference:
+- Build a clean “analysis mode” concept such as:
+  - metadata_only
+  - metadata_plus_audio
+  - recorded_audio
+This mode should propagate through the response and UI.
+
+Acceptance criteria:
+- For supported audio inputs, the backend uses real timing-aware preprocessing.
+- The returned hook/mood/voiceover sections are informed by actual signal-derived timing where available.
+
+==================================================
+PHASE 5 — MIC / LIVE AUDIO INPUT
+==================================================
+
+Objective:
+Add record-and-analyze support from the frontend.
+
+Requirements:
+1. Add a frontend mic recording flow:
+   - start recording
+   - stop recording
+   - review/submit
+   - clear/reset
+2. Send recorded audio to the backend in a supported format.
+3. Add a backend endpoint for audio upload/analysis.
+4. Run the same analysis pipeline on recorded audio.
+5. Return the same structured SongAnalysisResult shape used by link analysis.
+6. Render results in the same dashboard UI, with source clearly labeled as mic/recorded audio.
+7. Add permission-denied and unsupported-browser handling.
+8. Add loading/progress/error states for recording and upload.
+
+Implementation guidance:
+- Build reusable frontend components for the recording flow.
+- Keep the UX polished and intuitive.
+- Show elapsed time while recording.
+- Prevent accidental double submits.
+- Store only what is needed; do not silently retain large audio blobs forever.
+- If useful, add a temporary waveform/progress visualization, but only if it does not overcomplicate the codebase.
+
+Acceptance criteria:
+- A user can record audio in the browser, submit it, and receive a structured BeatMap result.
+- Errors are explicit and recoverable.
+
+==================================================
+PHASE 6 — AGENT ORCHESTRATION LAYER
+==================================================
+
+Objective:
+Introduce a clean orchestration layer aligned with the planned Gemini + ADK + MCP direction, without making the codebase brittle.
+
+Requirements:
+1. Add a backend orchestration layer that separates:
+   - input classification
+   - metadata lookup
+   - audio preprocessing
+   - AI reasoning
+   - recommendation generation
+   - response formatting
+2. Make the orchestration extensible so future tools/services can be plugged in cleanly.
+3. Add clear internal boundaries between deterministic processing and model-based reasoning.
+4. Use tool/service abstractions rather than route-level spaghetti.
+5. If ADK/MCP are feasible in this environment, integrate them cleanly.
+6. If full ADK/MCP integration is not practical right now, implement an internal orchestration layer with interfaces that are ADK/MCP-ready later.
+
+Implementation guidance:
+- Create a dedicated orchestration package/service.
+- Think in terms of stages/jobs/tools.
+- Keep the public API stable even if internals evolve.
+- Add logging for stage execution and failure points.
+- Add timeouts and fallbacks so one failing tool does not crash the entire request.
+
+Acceptance criteria:
+- The analysis pipeline is modular and staged, not a monolithic route function.
+- Future tools can be added without rewriting the app architecture.
+
+==================================================
+PHASE 7 — ALTERNATIVE TRACK RECOMMENDATION ENGINE
+==================================================
+
+Objective:
+Replace placeholder alternatives with a real recommendation strategy.
+
+Requirements:
+1. Design a recommendation approach that uses available evidence such as:
+   - platform metadata
+   - mood profile
+   - pacing/energy characteristics
+   - scene-fit categories
+   - Gemini-generated reasoning
+2. Return multiple alternative tracks with:
+   - title
+   - artist
+   - reason
+   - optionally source/platform if available
+3. Rank recommendations by creative usefulness, not random similarity.
+4. Make the reasons specific and grounded in the analysis.
+5. If a fully external recommendation source is not available, implement a transparent inference-based alternative recommendation approach and label it honestly.
+
+Implementation guidance:
+- Do not leave this as static hardcoded suggestions.
+- Prefer a layered strategy:
+  - candidate generation
+  - scoring/ranking
+  - explanation generation
+- The scoring should consider scene fit, emotional arc, pacing, and editorial use case.
+- Keep the API shape compatible with the existing frontend result cards.
+
+Acceptance criteria:
+- Alternative tracks vary by input.
+- Recommendation reasons are specific and believable.
+- The system does not show the same canned alternatives for every song.
+
+==================================================
+PHASE 8 — PERSISTENCE / PROJECT MEMORY
+==================================================
+
+Objective:
+Save and revisit analyses.
+
+Requirements:
+1. Add persistence for completed analyses.
+2. Support:
+   - saving analysis records
+   - listing recent analyses
+   - reopening a prior analysis
+   - optionally deleting an analysis
+3. Store enough metadata for a useful history view:
+   - id
+   - created time
+   - input source
+   - platform
+   - source label
+   - title
+   - artist
+   - thumbnail
+   - analysis mode
+   - full result payload
+4. Add a frontend history/recent analyses section or page.
+5. Make revisiting a past analysis easy and visually clean.
+
+Implementation guidance:
+- Choose a storage approach that is simple and reliable in Replit.
+- A lightweight database is fine if it keeps the app maintainable.
+- Add backend CRUD routes or service functions as needed.
+- Keep the persistence model compatible with later upgrades to auth/user accounts if needed.
+- Do not overengineer multi-user auth unless it is necessary for the current app.
+- If user/project separation is added, keep it optional and simple.
+
+Acceptance criteria:
+- An analyzed link or recording can be reopened later from history.
+- Recent analyses persist across app restarts according to the chosen storage setup.
+
+==================================================
+BACKEND ARCHITECTURE REQUIREMENTS
+==================================================
+
+Refactor or extend the backend to include clean modules similar to:
+- app/main.py
+- app/settings.py
+- app/api/routes.py
+- app/api/schemas.py
+- app/services/
+  - metadata/
+  - soundcloud/
+  - youtube/
+  - gemini/
+  - audio/
+  - recommendations/
+  - persistence/
+  - orchestration/
+- app/models/ if database models are introduced
+- app/db/ if database setup is introduced
+
+Requirements:
+1. Centralize config in settings.
+2. Support these secrets/env vars where relevant:
+   - YOUTUBE_API_KEY
+   - GEMINI_API_KEY
+   - GOOGLE_API_KEY
+   - any DB path/url you introduce
+3. Add typed schemas for all requests/responses.
+4. Keep routes thin and service layers responsible for logic.
+5. Add helpful logging and exception handling.
+6. Ensure all endpoints are Replit-friendly.
+
+Suggested new/updated API surface:
+- GET /health
+- POST /api/analyze/link
+- POST /api/analyze/audio
+- GET /api/analyses
+- GET /api/analyses/{id}
+- DELETE /api/analyses/{id}   (optional)
+
+==================================================
+FRONTEND ARCHITECTURE REQUIREMENTS
+==================================================
+
+Refactor or extend the frontend to include clean modules/components such as:
+- app/page.tsx or app/(routes)/...
+- components/
+  - link-input-form
+  - recorder
+  - analysis-header
+  - analysis-sections
+  - status-state
+  - recent-analyses
+  - empty-state
+- lib/
+  - api client
+  - formatters
+  - types
+- hooks/ if useful
+- keep Tailwind styling consistent
+
+Requirements:
+1. Strong empty/loading/error/success UX.
+2. Reusable components.
+3. Mobile-friendly layout.
+4. Real result rendering across link and mic flows.
+5. History/recent analyses UI.
+6. No leaked backend secrets to the client.
+
+==================================================
+DATA MODEL / SCHEMA REQUIREMENTS
+==================================================
+
+Ensure the main result shape remains coherent and typed. Extend as needed, but keep it consistent. Include fields such as:
+- songTitle
+- artistName
+- source
+- sourceLabel
+- platform
+- youtubeVideoId
+- soundcloudPath
+- thumbnailUrl
+- summary
+- analysisMode
+- confidence or limitations if helpful
+- moodShifts[]
+- hookWindow
+- voiceoverSafeSections[]
+- sceneFitSuggestions[]
+- alternativeTracks[]
+
+If you need to extend the schema, do it thoughtfully and keep frontend/backend aligned.
+
+==================================================
+VALIDATION AND QUALITY REQUIREMENTS
+==================================================
+
+1. Run the app in Replit after changes.
+2. Verify:
+   - YouTube link flow
+   - SoundCloud link flow
+   - mic flow
+   - missing Gemini key fallback behavior
+   - missing artwork fallback
+   - history persistence
+3. Remove or replace any remaining fake placeholder logic that would mislead a viewer during a portfolio demo.
+4. Keep comments useful but not excessive.
+5. Make the result feel like a real portfolio project, not a prototype glued together.
+
+==================================================
+IMPORTANT LIMITATION HANDLING
+==================================================
+
+If the environment cannot fully support deep waveform analysis for arbitrary YouTube or SoundCloud links:
+- do not hide that
+- implement the most honest, high-quality fallback possible
+- clearly label whether the result is:
+  - metadata-based
+  - audio-assisted
+  - recorded-audio analysis
+- make the UI summary communicate the evidence source and confidence
+- still keep the experience polished
+
+==================================================
+WHAT I WANT BACK FROM YOU AT THE END
+==================================================
+
+After implementation, provide:
+1. A summary of files changed and why
+2. Any new dependencies added
+3. Any new Replit secrets required
+4. Any migration/setup steps
+5. Exact test steps for:
+   - YouTube
+   - SoundCloud
+   - mic recording
+   - history/reopen
+6. Any limitations that remain
+7. A suggested git commit message
+
+Start now, inspect the current codebase, then implement all of the above directly in the repo.

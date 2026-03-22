@@ -1,4 +1,5 @@
 export type InputSource = "link" | "mic";
+export type AnalysisMode = "metadata_only" | "recorded_audio";
 
 export type SceneFitCategory =
   | "intro"
@@ -47,11 +48,13 @@ export interface AlternativeTrack {
 }
 
 export interface SongAnalysisResult {
+  id?: string | null;
   songTitle: string;
   artistName: string;
   source: InputSource;
   sourceLabel: string;
   platform: string;
+  analysisMode: AnalysisMode;
   youtubeVideoId?: string | null;
   soundcloudPath?: string | null;
   thumbnailUrl?: string | null;
@@ -61,4 +64,19 @@ export interface SongAnalysisResult {
   voiceoverSafeSections: VoiceoverSafeSection[];
   hookWindow: HookWindow;
   alternatives: AlternativeTrack[];
+}
+
+export interface AnalysisRecord {
+  id: string;
+  createdAt: string;
+  platform: string;
+  sourceLabel: string;
+  songTitle: string;
+  artistName: string;
+  thumbnailUrl?: string | null;
+  analysisMode: AnalysisMode;
+}
+
+export interface AnalysisListResponse {
+  analyses: AnalysisRecord[];
 }
