@@ -3,6 +3,6 @@ uvicorn
 python-dotenv
 httpx
 pydantic
-google-generativeai
+google-genai
 python-multipart
 aiofiles

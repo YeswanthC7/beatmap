@@ -1,7 +1,6 @@
 import json
 import logging
 import re
-import tempfile
 from pathlib import Path
 
 from app.settings import settings
@@ -41,7 +40,6 @@ ANALYSIS_SCHEMA = """
 
 
 def _parse_json_response(text: str) -> dict:
-    """Extract and parse JSON from a Gemini response, stripping any markdown fences."""
     text = text.strip()
     match = re.search(r"```(?:json)?\s*([\s\S]+?)\s*```", text)
     if match:
@@ -50,7 +48,6 @@ def _parse_json_response(text: str) -> dict:
 
 
 def _normalize_analysis(data: dict) -> dict:
-    """Validate and normalise the raw dict from Gemini."""
     valid_categories = set(SCENE_CATEGORIES)
 
     scene_fits = []
@@ -78,17 +75,19 @@ def _normalize_analysis(data: dict) -> dict:
     }
 
 
-def _get_model():
-    """Return a configured Gemini GenerativeModel, or None if unavailable."""
+def _get_client():
+    """Return a configured google.genai Client, or None if unavailable."""
     if not settings.has_gemini:
         return None
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=settings.gemini_api_key)
-        return genai.GenerativeModel("gemini-2.0-flash")
+        from google import genai
+        return genai.Client(api_key=settings.gemini_api_key)
     except Exception as exc:
-        logger.error("Failed to initialise Gemini model: %s", exc)
+        logger.error("Failed to initialise Gemini client: %s", exc)
         return None
+
+
+MODEL = "gemini-2.0-flash-lite"
 
 
 async def analyse_song_from_metadata(
@@ -98,8 +97,8 @@ async def analyse_song_from_metadata(
     source_label: str,
 ) -> dict | None:
     """Use Gemini to generate scene analysis based on song metadata."""
-    model = _get_model()
-    if model is None:
+    client = _get_client()
+    if client is None:
         logger.info("Gemini unavailable — skipping metadata analysis")
         return None
 
@@ -123,9 +122,10 @@ Requirements:
 Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
 
     try:
-        response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"},
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=prompt,
+            config={"response_mime_type": "application/json"},
         )
         data = _parse_json_response(response.text)
         return _normalize_analysis(data)
@@ -136,20 +136,17 @@ Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
 
 async def analyse_audio_file(audio_path: Path, duration_seconds: float) -> dict | None:
     """Use Gemini to analyse an uploaded audio file."""
-    if not settings.has_gemini:
+    client = _get_client()
+    if client is None:
         logger.info("Gemini unavailable — skipping audio analysis")
         return None
 
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=settings.gemini_api_key)
-    except Exception as exc:
-        logger.error("Failed to configure Gemini: %s", exc)
-        return None
-
-    try:
-        uploaded = genai.upload_file(str(audio_path))
-        logger.info("Uploaded audio to Gemini: %s", uploaded.name)
+        from google import genai as _genai
+        uploaded = _genai.Client(api_key=settings.gemini_api_key).files.upload(
+            file=str(audio_path),
+        )
+        logger.info("Uploaded audio to Gemini Files API: %s", uploaded.name)
     except Exception as exc:
         logger.error("Failed to upload audio to Gemini: %s", exc)
         return None
@@ -170,12 +167,15 @@ Requirements:
 
 Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
 
-    model = genai.GenerativeModel("gemini-2.0-flash")
-
     try:
-        response = model.generate_content(
-            [uploaded, prompt],
-            generation_config={"response_mime_type": "application/json"},
+        from google.genai import types as genai_types
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=[
+                genai_types.Part.from_uri(file_uri=uploaded.uri, mime_type=uploaded.mime_type or "audio/webm"),
+                prompt,
+            ],
+            config={"response_mime_type": "application/json"},
         )
         data = _parse_json_response(response.text)
         return _normalize_analysis(data)
@@ -184,6 +184,6 @@ Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
         return None
     finally:
         try:
-            genai.delete_file(uploaded.name)
+            client.files.delete(name=uploaded.name)
         except Exception:
             pass
