@@ -73,18 +73,35 @@ export function TrendingSection({ preset, onAnalyze }: TrendingSectionProps) {
           transition={{ duration: 0.6 }}
           className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
         >
-          <div>
-            <span className="inline-block rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-orange-300 mb-3">
-              🔥 Trending now
-            </span>
-            <h2 className="font-display text-4xl font-extrabold text-white sm:text-5xl">
-              Popular songs people are{" "}
-              <span className="gradient-text">using right now</span>
-            </h2>
-            <p className="mt-2 text-sm text-white/40">
-              Pick one and analyze it instantly.
-              {cached && " · Showing curated picks"}
-            </p>
+          <div className="flex items-start gap-4">
+            {/* CyberDJ creature cameo */}
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="pointer-events-none shrink-0 select-none hidden sm:block"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/creatures/cyberdj.png" alt="CyberDJ"
+                className="h-20 w-20 object-contain object-bottom rounded-2xl"
+                style={{
+                  filter: "drop-shadow(0 0 16px rgba(217,70,239,0.4))",
+                  background: "linear-gradient(135deg, rgba(217,70,239,0.1), rgba(13,0,24,0.8))",
+                }}
+              />
+            </motion.div>
+            <div>
+              <span className="inline-block rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-orange-300 mb-3">
+                🔥 Trending now
+              </span>
+              <h2 className="font-display text-4xl font-extrabold text-white sm:text-5xl">
+                Popular songs people are{" "}
+                <span className="gradient-text">using right now</span>
+              </h2>
+              <p className="mt-2 text-sm text-white/40">
+                Pick one and analyze it instantly.
+                {cached && " · Showing curated picks"}
+              </p>
+            </div>
           </div>
           {loading && (
             <div className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-transparent"
