@@ -75,8 +75,65 @@ def _normalize_analysis(data: dict) -> dict:
     }
 
 
-def _get_client():
-    """Return a configured google.genai Client, or None if unavailable."""
+# ---------------------------------------------------------------------------
+# Groq provider
+# ---------------------------------------------------------------------------
+
+GROQ_MODEL = "llama-3.3-70b-versatile"
+
+
+def _is_quota_error_groq(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    return "429" in msg or "rate_limit" in msg or "quota" in msg
+
+
+def _get_groq_client():
+    if not settings.has_groq:
+        return None
+    try:
+        from groq import Groq
+        return Groq(api_key=settings.groq_api_key)
+    except Exception as exc:
+        logger.error("Failed to initialise Groq client: %s", exc)
+        return None
+
+
+async def _analyse_via_groq(prompt: str) -> tuple[dict | None, str]:
+    """Call Groq chat completions and return (result, failure_reason)."""
+    client = _get_groq_client()
+    if client is None:
+        return None, "no_key"
+    try:
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"},
+            temperature=0.7,
+        )
+        raw = response.choices[0].message.content or ""
+        data = _parse_json_response(raw)
+        return _normalize_analysis(data), ""
+    except Exception as exc:
+        if _is_quota_error_groq(exc):
+            logger.warning("Groq rate limit hit: %s", exc)
+            return None, "quota"
+        logger.error("Groq analysis failed: %s", exc)
+        return None, "error"
+
+
+# ---------------------------------------------------------------------------
+# Gemini provider (fallback)
+# ---------------------------------------------------------------------------
+
+GEMINI_MODEL = "gemini-2.0-flash-lite"
+
+
+def _is_quota_error_gemini(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    return "quota" in msg or "429" in msg or "resource_exhausted" in msg
+
+
+def _get_gemini_client():
     if not settings.has_gemini:
         return None
     try:
@@ -87,13 +144,30 @@ def _get_client():
         return None
 
 
-MODEL = "gemini-2.0-flash-lite"
+async def _analyse_via_gemini(prompt: str) -> tuple[dict | None, str]:
+    """Call Gemini and return (result, failure_reason)."""
+    client = _get_gemini_client()
+    if client is None:
+        return None, "no_key"
+    try:
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config={"response_mime_type": "application/json"},
+        )
+        data = _parse_json_response(response.text)
+        return _normalize_analysis(data), ""
+    except Exception as exc:
+        if _is_quota_error_gemini(exc):
+            logger.warning("Gemini quota exceeded: %s", exc)
+            return None, "quota"
+        logger.error("Gemini analysis failed: %s", exc)
+        return None, "error"
 
 
-def _is_quota_error(exc: Exception) -> bool:
-    msg = str(exc).lower()
-    return "quota" in msg or "429" in msg or "resource_exhausted" in msg
-
+# ---------------------------------------------------------------------------
+# Public API — try Groq first, fall back to Gemini
+# ---------------------------------------------------------------------------
 
 async def analyse_song_from_metadata(
     title: str,
@@ -101,19 +175,16 @@ async def analyse_song_from_metadata(
     platform: str,
     source_label: str,
 ) -> tuple[dict | None, str]:
-    """Use Gemini to generate scene analysis based on song metadata.
+    """Generate scene analysis from song metadata.
+
+    Tries Groq first (if GROQ_API_KEY is set), then falls back to Gemini.
 
     Returns (result_dict, failure_reason) where failure_reason is one of:
-      "" — success
-      "no_key" — GEMINI_API_KEY not configured
-      "quota" — API quota exhausted
-      "error" — other failure
+      ""        — success
+      "no_key"  — no AI key configured
+      "quota"   — API quota/rate-limit exhausted
+      "error"   — unexpected failure
     """
-    client = _get_client()
-    if client is None:
-        logger.info("Gemini unavailable — no API key configured")
-        return None, "no_key"
-
     prompt = f"""You are a professional music supervisor creating scene-fit analysis for film and video production.
 
 Analyse this song based on your knowledge and return a JSON object ONLY — no markdown, no extra text.
@@ -133,28 +204,30 @@ Requirements:
 
 Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
 
-    try:
-        response = client.models.generate_content(
-            model=MODEL,
-            contents=prompt,
-            config={"response_mime_type": "application/json"},
-        )
-        data = _parse_json_response(response.text)
-        return _normalize_analysis(data), ""
-    except Exception as exc:
-        if _is_quota_error(exc):
-            logger.warning("Gemini quota exceeded: %s", exc)
-            return None, "quota"
-        logger.error("Gemini metadata analysis failed: %s", exc)
-        return None, "error"
+    if settings.has_groq:
+        logger.info("Using Groq (%s) for metadata analysis", GROQ_MODEL)
+        result, reason = await _analyse_via_groq(prompt)
+        if result is not None:
+            return result, reason
+        logger.warning("Groq failed (%s), trying Gemini fallback", reason)
+
+    if settings.has_gemini:
+        logger.info("Using Gemini (%s) for metadata analysis", GEMINI_MODEL)
+        return await _analyse_via_gemini(prompt)
+
+    return None, "no_key"
 
 
-async def analyse_audio_file(audio_path: Path, duration_seconds: float) -> dict | None:
-    """Use Gemini to analyse an uploaded audio file."""
-    client = _get_client()
+async def analyse_audio_file(audio_path: Path, duration_seconds: float) -> tuple[dict | None, str]:
+    """Analyse an uploaded audio file.
+
+    Groq does not support audio uploads, so this uses Gemini only.
+    Returns (result_dict, failure_reason).
+    """
+    client = _get_gemini_client()
     if client is None:
         logger.info("Gemini unavailable — skipping audio analysis")
-        return None
+        return None, "no_key"
 
     try:
         from google import genai as _genai
@@ -164,7 +237,7 @@ async def analyse_audio_file(audio_path: Path, duration_seconds: float) -> dict 
         logger.info("Uploaded audio to Gemini Files API: %s", uploaded.name)
     except Exception as exc:
         logger.error("Failed to upload audio to Gemini: %s", exc)
-        return None
+        return None, "error"
 
     prompt = f"""You are a professional music supervisor analysing a recorded audio clip for scene-fit use in film, video, and content production.
 
@@ -185,7 +258,7 @@ Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
     try:
         from google.genai import types as genai_types
         response = client.models.generate_content(
-            model=MODEL,
+            model=GEMINI_MODEL,
             contents=[
                 genai_types.Part.from_uri(file_uri=uploaded.uri, mime_type=uploaded.mime_type or "audio/webm"),
                 prompt,
@@ -193,10 +266,13 @@ Return this exact JSON structure:{ANALYSIS_SCHEMA}"""
             config={"response_mime_type": "application/json"},
         )
         data = _parse_json_response(response.text)
-        return _normalize_analysis(data)
+        return _normalize_analysis(data), ""
     except Exception as exc:
+        if _is_quota_error_gemini(exc):
+            logger.warning("Gemini quota exceeded during audio analysis: %s", exc)
+            return None, "quota"
         logger.error("Gemini audio analysis failed: %s", exc)
-        return None
+        return None, "error"
     finally:
         try:
             client.files.delete(name=uploaded.name)

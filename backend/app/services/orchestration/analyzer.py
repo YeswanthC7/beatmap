@@ -241,15 +241,10 @@ async def analyse_audio_upload(
         duration = get_audio_duration(audio_path) or 30.0
         logger.info("Audio upload: file=%s size=%d duration=%.1fs", filename, len(audio_bytes), duration)
 
-        ai = await analyse_audio_file(audio_path, duration)
+        ai, failure_reason = await analyse_audio_file(audio_path, duration)
 
         if ai is None:
-            ai = _fallback_analysis("Recorded Audio", "Unknown Artist", "mic", "recorded_audio")
-            ai["summary"] = (
-                f"Recorded audio clip (~{duration:.0f}s) received. "
-                "AI analysis is unavailable (no Gemini API key). "
-                "Configure GEMINI_API_KEY to enable real audio intelligence."
-            )
+            ai = _fallback_analysis("Recorded Audio", "Unknown Artist", failure_reason)
 
         result = _build_result(
             song_title="Recorded Audio",

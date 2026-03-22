@@ -3,6 +3,7 @@ uvicorn
 python-dotenv
 httpx
 pydantic
+groq
 google-genai
 python-multipart
 aiofiles
