@@ -1,8 +1,8 @@
 # BeatMap
 
-> AI-powered music intelligence engine — turn any song link or live recording into timestamped scene-fit intelligence for video creators.
+> AI-powered music intelligence engine — turn any song link or live recording into timestamped edit plans for video creators.
 
-BeatMap answers the question every creator, editor, and marketer actually needs answered:
+BeatMap answers the question every creator, editor, and marketer needs answered:
 
 **Which part of this song should I use — and for what?**
 
@@ -10,7 +10,7 @@ Paste a YouTube or SoundCloud link, pick your video type, and BeatMap returns ti
 
 ---
 
-## What's been built
+## Features
 
 ### Core analysis pipeline
 
@@ -18,14 +18,14 @@ Paste a YouTube or SoundCloud link, pick your video type, and BeatMap returns ti
 - Real YouTube Data API v3 metadata fetching (title, artist, thumbnail)
 - SoundCloud oEmbed metadata fetching (no key required)
 - Microphone recording via the browser MediaRecorder API
-- Groq (primary AI — `llama-3.3-70b-versatile`) + Google Gemini Flash Lite (fallback) dual-provider chain
+- Groq (`llama-3.3-70b-versatile`) primary + Google Gemini Flash Lite fallback AI chain
 - Audio file upload to Gemini Files API for actual audio analysis
 - Graceful degradation — if both AI providers fail, honest placeholder returned (never silent)
 - SQLite persistence for all past analyses, with preset column
 
 ### Edit-type presets (15 types)
 
-Every analysis is tailored to the creator's video type. The AI prompts change based on the selected preset:
+Every analysis is tailored to the creator's video type:
 
 | Preset | Purpose |
 |--------|---------|
@@ -45,7 +45,7 @@ Every analysis is tailored to the creator's video type. The AI prompts change ba
 | Slideshow / Memories | Gentle, nostalgic sections |
 | General Edit | Balanced for any use |
 
-### Analysis output (per analysis)
+### Analysis output (per song)
 
 - **Summary** — 2–3 sentence description tailored to the selected preset
 - **Energy map** — 4–6 timestamped mood shifts with `low / medium / high` intensity
@@ -61,21 +61,24 @@ Every analysis is tailored to the creator's video type. The AI prompts change ba
 - `GET /api/trending?language=worldwide` — live YouTube Music chart
 - 8 language tabs: Worldwide, English, Hindi, Telugu, Tamil, Spanish, Korean, Japanese
 - One-click "Analyse →" from any trending card passes the URL directly into analysis
-- Curated fallback list for each language if YouTube API is rate-limited or unavailable
+- Curated fallback list for each language if YouTube API is rate-limited
 
 ### Track comparison
 
 - `POST /api/compare` — analyse 2–3 songs simultaneously for a given edit type
 - Returns a ranked winner with per-track fit scores, best cut windows, voiceover suitability, and emotional payoff summary
 
-### Frontend UI
+---
 
-- Hero with animated AI character carousel (producer, cyberdj, jazzman, lofi, raver)
-- Preset selector grid above all inputs
-- Scrolling marquee strip and three-column animated card showcase
-- Analysis result dashboard with colour-coded cards for all output sections
-- History panel for past analyses
-- Compare panel for multi-track evaluation
+## Design
+
+BeatMap uses a Web3 brutalist visual system:
+
+- **Typography** — Anton (display) + Space Grotesk (body)
+- **Palette** — Deep black (`#0B0C10`) base, neon green (`#CCFF00`) as the sole accent/CTA colour, white for text
+- **Layout** — Hard edges, 1px borders, no border-radius except chips
+- **Motion** — Subtle glitch preloader, floating AI character illustrations, scroll-reveal sections
+- **Sections** — Hero with animated word cycle, faction preset panels, full analyse dashboard, trending chart, FAQ, footer
 
 ---
 
@@ -83,27 +86,27 @@ Every analysis is tailored to the creator's video type. The AI prompts change ba
 
 ### Frontend
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| Next.js | 16 | React framework, routing, API proxying |
-| React | 19 | UI rendering |
-| TypeScript | 5 | Type safety |
-| Tailwind CSS | 4 | Styling |
-| next/font | — | Syne (display) + Inter (body) fonts |
+| Technology | Purpose |
+|-----------|---------|
+| Next.js 16 | React framework, routing, API proxying |
+| React 19 | UI rendering |
+| TypeScript 5 | Type safety |
+| Tailwind CSS 4 | Utility styling |
+| Framer Motion | Animations and transitions |
+| Anton + Space Grotesk | Display and body fonts |
 
 ### Backend
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| FastAPI | latest | REST API framework |
-| Python | 3.12 | Runtime |
-| Pydantic | v2 | Schema validation |
-| Uvicorn | latest | ASGI server |
-| HTTPX | latest | Async HTTP client |
-| Groq SDK | latest | Primary AI (Llama 3.3 70b) |
-| google-genai | latest | Gemini AI (fallback + audio) |
-| SQLite | stdlib | Analysis persistence |
-| python-dotenv | latest | Environment variable loading |
+| Technology | Purpose |
+|-----------|---------|
+| FastAPI | REST API framework |
+| Python 3.12 | Runtime |
+| Pydantic v2 | Schema validation |
+| Uvicorn | ASGI server |
+| HTTPX | Async HTTP client |
+| Groq SDK | Primary AI (Llama 3.3 70b) |
+| google-genai | Gemini AI (fallback + audio) |
+| SQLite | Analysis persistence |
 
 ### AI providers
 
@@ -121,58 +124,52 @@ beatmap/
 ├── frontend/
 │   └── src/
 │       ├── app/
-│       │   ├── page.tsx              main page (all tabs, preset, trending)
-│       │   ├── layout.tsx
-│       │   └── globals.css
+│       │   ├── page.tsx                   main page orchestrator
+│       │   ├── layout.tsx                 fonts, metadata
+│       │   ├── globals.css                design system (palette, glitch, marquee)
+│       │   └── how-it-works/page.tsx      explainer page
 │       ├── components/
-│       │   ├── analysis-result.tsx   full result dashboard
-│       │   ├── best-cuts-section.tsx 15s / 30s / 45s cut cards
-│       │   ├── shot-plan-section.tsx step-by-step editing timeline
-│       │   ├── preset-selector.tsx   15-type edit preset grid
-│       │   ├── trending-section.tsx  live trending tracks (8 languages)
-│       │   ├── compare-tracks.tsx    multi-song comparison panel
-│       │   ├── link-input-form.tsx   URL input
-│       │   ├── recorder.tsx          mic recording
-│       │   ├── creature-showcase.tsx animated AI character carousel
-│       │   ├── hero-background.tsx   gradient blob background
-│       │   ├── marquee-strip.tsx     scrolling banner
-│       │   ├── scrolling-cards.tsx   animated card showcase
-│       │   ├── empty-state.tsx       pre-analysis hint
-│       │   ├── recent-analyses.tsx   history panel
-│       │   └── result-card.tsx       generic card wrapper
+│       │   ├── bm-loader.tsx              preloader with glitch animation
+│       │   ├── bm-nav.tsx                 frosted-glass fixed nav
+│       │   ├── bm-progress.tsx            scroll-position dot indicator
+│       │   ├── bm-hero.tsx                hero section with animated word cycle
+│       │   ├── bm-factions.tsx            preset faction panels
+│       │   ├── bm-analyze.tsx             analyse dashboard (link / mic / compare / history)
+│       │   ├── bm-trending.tsx            trending tracks in 8 languages
+│       │   ├── bm-faq.tsx                 FAQ accordion
+│       │   ├── bm-footer.tsx              footer with big CTA
+│       │   ├── analysis-result.tsx        full result dashboard
+│       │   ├── best-cuts-section.tsx      15s / 30s / 45s cut cards
+│       │   ├── shot-plan-section.tsx      step-by-step editing timeline
+│       │   ├── compare-tracks.tsx         multi-song comparison panel
+│       │   ├── recorder.tsx               mic recording (MediaRecorder)
+│       │   └── recent-analyses-section.tsx history panel
 │       ├── types/
-│       │   └── analysis.ts           all TypeScript types + PRESET_OPTIONS
+│       │   └── analysis.ts                all TypeScript types + PRESET_OPTIONS
 │       └── lib/
-│           ├── api.ts                typed API client
-│           ├── formatters.ts         label helpers
-│           └── platform.ts           platform display helper
+│           ├── api.ts                     typed API client
+│           ├── formatters.ts              label helpers
+│           └── platform.ts                platform display helper
 │
 ├── backend/
 │   └── app/
-│       ├── main.py                   FastAPI app + CORS + lifespan
-│       ├── settings.py               env-based config
+│       ├── main.py                        FastAPI app + CORS + lifespan
+│       ├── settings.py                    env-based config
 │       ├── api/
-│       │   ├── routes.py             all API endpoints
-│       │   ├── schemas.py            Pydantic models (request + response)
-│       │   ├── link_utils.py         platform detection
-│       │   ├── youtube_utils.py      YouTube video ID extraction
-│       │   └── soundcloud_utils.py   SoundCloud path extraction
+│       │   ├── routes.py                  all API endpoints
+│       │   ├── schemas.py                 Pydantic models
+│       │   ├── link_utils.py              platform detection
+│       │   ├── youtube_utils.py           YouTube video ID extraction
+│       │   └── soundcloud_utils.py        SoundCloud path extraction
 │       └── services/
-│           ├── gemini/
-│           │   └── client.py         Groq + Gemini AI chain, preset prompts
-│           ├── metadata/
-│           │   ├── youtube.py        YouTube Data API v3 client
-│           │   └── soundcloud.py     SoundCloud oEmbed client
-│           ├── orchestration/
-│           │   └── analyzer.py       analysis pipeline (link + audio)
-│           ├── trending/
-│           │   └── youtube.py        trending tracks + curated fallback
-│           ├── comparison/
-│           │   └── compare.py        multi-track comparison + fit scoring
-│           ├── audio/
-│           │   └── processor.py      audio file utilities
-│           └── persistence/
-│               └── db.py             SQLite CRUD
+│           ├── gemini/client.py           Groq + Gemini AI chain, preset prompts
+│           ├── metadata/youtube.py        YouTube Data API v3 client
+│           ├── metadata/soundcloud.py     SoundCloud oEmbed client
+│           ├── orchestration/analyzer.py  analysis pipeline (link + audio)
+│           ├── trending/youtube.py        trending tracks + curated fallback
+│           ├── comparison/compare.py      multi-track comparison + fit scoring
+│           ├── audio/processor.py         audio file utilities
+│           └── persistence/db.py          SQLite CRUD
 │
 └── README.md
 ```
@@ -194,7 +191,7 @@ beatmap/
 
 ---
 
-## Environment variables required
+## Environment variables
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
@@ -230,51 +227,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 # Swagger docs: http://localhost:8000/docs
 ```
 
-The frontend proxies `/api/*` to the backend via Next.js rewrites, so both run together with no CORS issues in development.
-
----
-
-## Development log
-
-### Day 1 — Project setup
-- Created GitHub repository, README, gitignore, MIT license
-- Built Next.js frontend with Tailwind CSS
-- Created FastAPI backend with `/health` and `/api/analyze/link` endpoints
-- Added Pydantic schemas and placeholder analysis response
-- Built initial analysis dashboard with mock data
-
-### Day 2 — Link intelligence pipeline
-- Platform detection for YouTube and SoundCloud links
-- YouTube video ID extraction (all link formats)
-- SoundCloud artist/track path extraction
-- API returns platform-specific identifiers
-
-### Day 3 — Real metadata
-- YouTube Data API v3 integration — real title, channel, thumbnail
-- SoundCloud oEmbed metadata fetching (no key required)
-- Frontend shows real thumbnails and song info
-
-### Day 4 — AI analysis engine
-- Groq (llama-3.3-70b) primary + Gemini Flash Lite fallback AI chain
-- Structured JSON analysis: mood shifts, hook window, voiceover sections, scene fits, alternatives
-- Audio upload endpoint with Gemini Files API for actual audio analysis
-- Microphone recording in the browser (MediaRecorder API)
-- SQLite persistence for all analyses
-- Graceful degradation with honest error labels
-
-### Day 5 — Hero UI + animated characters
-- Animated AI character carousel (producer, cyberdj, jazzman, lofi, raver)
-- Gradient blob hero background, marquee strip, scrolling card showcase
-- History panel for past analyses
-
-### Day 6 — Creator intelligence features
-- **15 edit-type presets** with tailored AI system prompts
-- **Best Cut Generator** — optimal 15s / 30s / 45s windows with confidence scores
-- **Shot Plan** — 5–7 step sequential editing plan per video type
-- **Upgraded voiceover guidance** — `great / okay / risky` safety levels with plain-English reasons
-- **Trending tracks** — live YouTube chart in 8 languages + curated fallback
-- **Track comparison** — compare 2–3 songs and get a ranked fit winner
-- Full frontend integration: preset selector, best cuts panel, shot plan timeline, compare panel, trending section
+The frontend proxies `/api/*` to the backend via Next.js rewrites — no CORS issues in development.
 
 ---
 
