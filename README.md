@@ -1,364 +1,283 @@
 # BeatMap
 
-BeatMap is an AI-powered music intelligence engine that converts song links or live audio into timestamped scene-fit insights, hook detection, voiceover-safe sections, and creative-use recommendations.
+> AI-powered music intelligence engine — turn any song link or live recording into timestamped scene-fit intelligence for video creators.
 
-## Abstract
+BeatMap answers the question every creator, editor, and marketer actually needs answered:
 
-BeatMap is designed as a portfolio-grade full-stack AI project that goes beyond simple music recognition. Instead of only identifying a song, BeatMap answers a more useful creative question:
+**Which part of this song should I use — and for what?**
 
-**Where can this song be used effectively in content?**
+Paste a YouTube or SoundCloud link, pick your video type, and BeatMap returns timestamped mood shifts, the best opening moment, optimal cut windows (15s / 30s / 45s), a step-by-step shot plan, voiceover-safe sections, and scene-fit scores — all tailored to your edit type.
 
-Given a song link or live microphone input, BeatMap generates a structured analysis that helps creators, editors, marketers, and storytellers understand:
+---
 
-- where the best hook moment occurs
-- which sections are safer for voiceover
-- how the energy and mood change over time
-- what creative scenarios the song fits best
-- which alternative tracks offer a similar direction
+## What's been built
 
-The long-term goal is to combine:
+### Core analysis pipeline
 
-- frontend audio interaction
-- backend analysis APIs
-- agent-based orchestration
-- MCP-compatible tool integration
-- real metadata extraction
-- AI reasoning for music structure
+- YouTube and SoundCloud link parsing (video ID, track path)
+- Real YouTube Data API v3 metadata fetching (title, artist, thumbnail)
+- SoundCloud oEmbed metadata fetching (no key required)
+- Microphone recording via the browser MediaRecorder API
+- Groq (primary AI — `llama-3.3-70b-versatile`) + Google Gemini Flash Lite (fallback) dual-provider chain
+- Audio file upload to Gemini Files API for actual audio analysis
+- Graceful degradation — if both AI providers fail, honest placeholder returned (never silent)
+- SQLite persistence for all past analyses, with preset column
 
-## Current Status
+### Edit-type presets (15 types)
 
-BeatMap is currently in early development.
+Every analysis is tailored to the creator's video type. The AI prompts change based on the selected preset:
 
-The project already includes:
+| Preset | Purpose |
+|--------|---------|
+| Instagram Reel | Punchy 15–30s hooks |
+| TikTok / Short | Attention-grabbing opening second |
+| YouTube Intro | 10–20s dramatic channel opener |
+| Travel Montage | Scenic builds and cinematic transitions |
+| Product Ad | Clean intro + clear payoff CTA |
+| Fashion / Luxury | Smooth, elegant atmospheric sections |
+| Emotional Story | Gentle builds and heartfelt peaks |
+| Wedding / Memory | Warm, romantic sections |
+| Gym / Hype Edit | Hard drops and intense energy peaks |
+| Podcast Intro | Professional 5–15s opener |
+| Documentary | Cinematic builds and tension |
+| Gaming Montage | Intense beats and dramatic finish |
+| Vlog | Upbeat but doesn't overpower speech |
+| Slideshow / Memories | Gentle, nostalgic sections |
+| General Edit | Balanced for any use |
 
-- Next.js frontend
-- FastAPI backend
-- structured analysis models
-- mock analysis dashboard
-- platform detection for links
-- YouTube and SoundCloud link parsing
-- real YouTube metadata fetching
-- thumbnail support for YouTube links
-- API endpoint for link analysis
+### Analysis output (per analysis)
 
-## Tech Stack
+- **Summary** — 2–3 sentence description tailored to the selected preset
+- **Energy map** — 4–6 timestamped mood shifts with `low / medium / high` intensity
+- **Best opening moment** — single strongest hook window for the chosen edit type
+- **Best cuts** — optimal 15s, 30s, and 45s windows with confidence scores and preset-specific reasoning
+- **Shot plan** — 5–7 step sequential cut plan describing what to show and when
+- **Voiceover sections** — `great / okay / risky` safety ratings with plain-English reasons
+- **Scene fits** — 3–4 creative use categories with confidence scores and timestamp ranges
+- **Similar tracks** — 2–3 free-to-use alternatives from open libraries
+
+### Trending tracks
+
+- `GET /api/trending?language=worldwide` — live YouTube Music chart
+- 8 language tabs: Worldwide, English, Hindi, Telugu, Tamil, Spanish, Korean, Japanese
+- One-click "Analyse →" from any trending card passes the URL directly into analysis
+- Curated fallback list for each language if YouTube API is rate-limited or unavailable
+
+### Track comparison
+
+- `POST /api/compare` — analyse 2–3 songs simultaneously for a given edit type
+- Returns a ranked winner with per-track fit scores, best cut windows, voiceover suitability, and emotional payoff summary
+
+### Frontend UI
+
+- Hero with animated AI character carousel (producer, cyberdj, jazzman, lofi, raver)
+- Preset selector grid above all inputs
+- Scrolling marquee strip and three-column animated card showcase
+- Analysis result dashboard with colour-coded cards for all output sections
+- History panel for past analyses
+- Compare panel for multi-track evaluation
+
+---
+
+## Tech stack
 
 ### Frontend
 
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| Next.js | 16 | React framework, routing, API proxying |
+| React | 19 | UI rendering |
+| TypeScript | 5 | Type safety |
+| Tailwind CSS | 4 | Styling |
+| next/font | — | Syne (display) + Inter (body) fonts |
 
 ### Backend
 
-- FastAPI
-- Python
-- Pydantic
-- Uvicorn
-- HTTPX
-- python-dotenv
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| FastAPI | latest | REST API framework |
+| Python | 3.12 | Runtime |
+| Pydantic | v2 | Schema validation |
+| Uvicorn | latest | ASGI server |
+| HTTPX | latest | Async HTTP client |
+| Groq SDK | latest | Primary AI (Llama 3.3 70b) |
+| google-genai | latest | Gemini AI (fallback + audio) |
+| SQLite | stdlib | Analysis persistence |
+| python-dotenv | latest | Environment variable loading |
 
-### Planned AI Layer
+### AI providers
 
-- Google Gemini API
-- Google ADK
-- MCP tools
+| Provider | Model | Role |
+|---------|-------|------|
+| Groq | `llama-3.3-70b-versatile` | Primary — fast metadata analysis |
+| Google Gemini | `gemini-2.0-flash-lite` | Fallback + audio file analysis |
 
-## Repository Structure
+---
 
-```txt
+## Repository structure
+
+```
 beatmap/
 ├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   ├── components/
-│   │   ├── lib/
-│   │   └── types/
+│   └── src/
+│       ├── app/
+│       │   ├── page.tsx              main page (all tabs, preset, trending)
+│       │   ├── layout.tsx
+│       │   └── globals.css
+│       ├── components/
+│       │   ├── analysis-result.tsx   full result dashboard
+│       │   ├── best-cuts-section.tsx 15s / 30s / 45s cut cards
+│       │   ├── shot-plan-section.tsx step-by-step editing timeline
+│       │   ├── preset-selector.tsx   15-type edit preset grid
+│       │   ├── trending-section.tsx  live trending tracks (8 languages)
+│       │   ├── compare-tracks.tsx    multi-song comparison panel
+│       │   ├── link-input-form.tsx   URL input
+│       │   ├── recorder.tsx          mic recording
+│       │   ├── creature-showcase.tsx animated AI character carousel
+│       │   ├── hero-background.tsx   gradient blob background
+│       │   ├── marquee-strip.tsx     scrolling banner
+│       │   ├── scrolling-cards.tsx   animated card showcase
+│       │   ├── empty-state.tsx       pre-analysis hint
+│       │   ├── recent-analyses.tsx   history panel
+│       │   └── result-card.tsx       generic card wrapper
+│       ├── types/
+│       │   └── analysis.ts           all TypeScript types + PRESET_OPTIONS
+│       └── lib/
+│           ├── api.ts                typed API client
+│           ├── formatters.ts         label helpers
+│           └── platform.ts           platform display helper
 │
 ├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── link_utils.py
-│   │   │   ├── routes.py
-│   │   │   ├── schemas.py
-│   │   │   ├── soundcloud_utils.py
-│   │   │   ├── youtube_client.py
-│   │   │   ├── youtube_schemas.py
-│   │   │   └── youtube_utils.py
-│   │   ├── main.py
-│   │   └── settings.py
-│   ├── requirements.txt
-│   ├── .env.example
-│   └── .env
+│   └── app/
+│       ├── main.py                   FastAPI app + CORS + lifespan
+│       ├── settings.py               env-based config
+│       ├── api/
+│       │   ├── routes.py             all API endpoints
+│       │   ├── schemas.py            Pydantic models (request + response)
+│       │   ├── link_utils.py         platform detection
+│       │   ├── youtube_utils.py      YouTube video ID extraction
+│       │   └── soundcloud_utils.py   SoundCloud path extraction
+│       └── services/
+│           ├── gemini/
+│           │   └── client.py         Groq + Gemini AI chain, preset prompts
+│           ├── metadata/
+│           │   ├── youtube.py        YouTube Data API v3 client
+│           │   └── soundcloud.py     SoundCloud oEmbed client
+│           ├── orchestration/
+│           │   └── analyzer.py       analysis pipeline (link + audio)
+│           ├── trending/
+│           │   └── youtube.py        trending tracks + curated fallback
+│           ├── comparison/
+│           │   └── compare.py        multi-track comparison + fit scoring
+│           ├── audio/
+│           │   └── processor.py      audio file utilities
+│           └── persistence/
+│               └── db.py             SQLite CRUD
 │
 └── README.md
+```
 
-Development Progress
-Day 1
+---
 
-Project setup and core architecture.
+## API endpoints
 
-Repository
+| Method | Endpoint | Body / Params | Description |
+|--------|----------|---------------|-------------|
+| `GET` | `/health` | — | Health check |
+| `POST` | `/api/analyze/link` | `{ url, preset }` | Analyse a YouTube or SoundCloud link |
+| `POST` | `/api/analyze/audio` | multipart file + preset | Analyse a mic recording or audio file |
+| `GET` | `/api/trending` | `?language=worldwide&limit=10` | Fetch trending music tracks |
+| `POST` | `/api/compare` | `{ urls: [...], preset }` | Compare 2–3 songs for a given edit type |
+| `GET` | `/api/analyses` | — | List past analyses (max 20) |
+| `GET` | `/api/analyses/{id}` | — | Get full analysis by ID |
+| `DELETE` | `/api/analyses/{id}` | — | Delete an analysis |
 
-Created GitHub repository
+---
 
-Added README
+## Environment variables required
 
-Added gitignore
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `GROQ_API_KEY` | Recommended | Primary AI provider (fast, free tier available) |
+| `GEMINI_API_KEY` | Optional | AI fallback + audio file analysis |
+| `YOUTUBE_API_KEY` | Recommended | YouTube metadata + trending tracks |
+| `DB_PATH` | Optional | SQLite file path (default: `beatmap.db`) |
 
-Added MIT license
+Get a free Groq key at [console.groq.com](https://console.groq.com).  
+Get a YouTube Data API v3 key at [console.cloud.google.com](https://console.cloud.google.com).  
+Get a Gemini key at [aistudio.google.com](https://aistudio.google.com).
 
-Frontend
+---
 
-Created Next.js project
+## Local development
 
-Added Tailwind CSS
+### Frontend
 
-Built homepage UI
-
-Created reusable UI components
-
-Added analysis result types
-
-Created mock analysis data
-
-Built analysis dashboard
-
-Backend
-
-Created FastAPI backend
-
-Added /health endpoint
-
-Added Pydantic schemas
-
-Created /api/analyze/link endpoint
-
-Connected backend routes
-
-Added placeholder analysis response
-
-Day 2
-
-Added the first part of the link intelligence pipeline.
-
-Platform Detection
-
-BeatMap now detects the platform from a pasted music link.
-
-Supported platforms:
-
-YouTube
-
-SoundCloud
-
-Unknown
-
-Implementation:
-
-backend/app/api/link_utils.py
-YouTube Link Parsing
-
-BeatMap can now extract the video ID from YouTube links.
-
-Supported formats:
-
-youtube.com/watch?v=VIDEO_ID
-youtu.be/VIDEO_ID
-
-Implementation:
-
-backend/app/api/youtube_utils.py
-
-Example:
-
-https://www.youtube.com/watch?v=dQw4w9WgXcQ
-
-Extracted:
-
-dQw4w9WgXcQ
-SoundCloud Link Parsing
-
-BeatMap can now extract the artist/track path from SoundCloud links.
-
-Example:
-
-https://soundcloud.com/forss/flickermood
-
-Extracted:
-
-forss/flickermood
-
-Implementation:
-
-backend/app/api/soundcloud_utils.py
-API Improvements
-
-The backend API now returns platform-specific identifiers.
-
-Example response:
-
-{
-  "platform": "youtube",
-  "youtubeVideoId": "dQw4w9WgXcQ"
-}
-Day 3
-
-Connected real YouTube metadata fetching.
-
-Environment Setup
-
-Added backend settings and environment variable loading for YouTube API access.
-
-Files added/updated:
-
-backend/app/settings.py
-backend/.env.example
-backend/.env
-YouTube Metadata Fetching
-
-BeatMap now fetches real YouTube metadata using the YouTube Data API.
-
-It currently pulls:
-
-video title
-
-channel title
-
-thumbnail URL
-
-Files added:
-
-backend/app/api/youtube_schemas.py
-backend/app/api/youtube_client.py
-Route Integration
-
-The link analysis route now:
-
-detects YouTube links
-
-extracts the video ID
-
-calls the YouTube Data API
-
-returns real song title, artist/channel, and thumbnail URL
-
-Updated file:
-
-backend/app/api/routes.py
-Frontend Type and Mock Updates
-
-Added thumbnail support to the shared analysis type and updated mock data.
-
-Updated files:
-
-frontend/src/types/analysis.ts
-frontend/src/lib/mock-analysis.ts
-UI Improvement
-
-The analysis dashboard now shows a thumbnail preview for a track when available.
-
-Updated file:
-
-frontend/src/app/page.tsx
-Verified Working Response
-
-Example working response:
-
-{
-  "songTitle": "Nee Gunde Lona Video Song | Dude| Pradeep R, Mamitha Baiju |  @SaiAbhyankkar  |Jonita |Keerthiswaran",
-  "artistName": "Think Music Telugu",
-  "source": "link",
-  "sourceLabel": "youtube.com/watch?v=d3Vnu_tsYPA",
-  "platform": "youtube",
-  "youtubeVideoId": "d3Vnu_tsYPA",
-  "soundcloudPath": null,
-  "thumbnailUrl": "https://i.ytimg.com/vi/d3Vnu_tsYPA/hqdefault.jpg"
-}
-Current Behavior
-
-When a link is submitted:
-
-Backend detects platform
-
-Extracts platform-specific identifiers
-
-Fetches real YouTube metadata for YouTube links
-
-Generates placeholder scene analysis
-
-Returns structured analysis JSON
-
-The frontend is ready to consume real analysis data, and YouTube links now return live title, channel, and thumbnail values.
-
-Local Development
-Run Frontend
+```bash
 cd frontend
 npm install
 npm run dev
+# Runs on http://localhost:5000
+```
 
-Frontend:
+### Backend
 
-http://localhost:3000
-Run Backend
+```bash
 cd backend
-source venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+# Runs on http://localhost:8000
+# Swagger docs: http://localhost:8000/docs
+```
 
-Backend:
+The frontend proxies `/api/*` to the backend via Next.js rewrites, so both run together with no CORS issues in development.
 
-http://127.0.0.1:8000
+---
 
-Swagger:
+## Development log
 
-http://127.0.0.1:8000/docs
-API
-Health
-GET /health
-Analyze Link
-POST /api/analyze/link
+### Day 1 — Project setup
+- Created GitHub repository, README, gitignore, MIT license
+- Built Next.js frontend with Tailwind CSS
+- Created FastAPI backend with `/health` and `/api/analyze/link` endpoints
+- Added Pydantic schemas and placeholder analysis response
+- Built initial analysis dashboard with mock data
 
-Example request:
+### Day 2 — Link intelligence pipeline
+- Platform detection for YouTube and SoundCloud links
+- YouTube video ID extraction (all link formats)
+- SoundCloud artist/track path extraction
+- API returns platform-specific identifiers
 
-{
-  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-}
-Next Steps
+### Day 3 — Real metadata
+- YouTube Data API v3 integration — real title, channel, thumbnail
+- SoundCloud oEmbed metadata fetching (no key required)
+- Frontend shows real thumbnails and song info
 
-Next milestones:
+### Day 4 — AI analysis engine
+- Groq (llama-3.3-70b) primary + Gemini Flash Lite fallback AI chain
+- Structured JSON analysis: mood shifts, hook window, voiceover sections, scene fits, alternatives
+- Audio upload endpoint with Gemini Files API for actual audio analysis
+- Microphone recording in the browser (MediaRecorder API)
+- SQLite persistence for all analyses
+- Graceful degradation with honest error labels
 
-Connect frontend link input to the backend endpoint
+### Day 5 — Hero UI + animated characters
+- Animated AI character carousel (producer, cyberdj, jazzman, lofi, raver)
+- Gradient blob hero background, marquee strip, scrolling card showcase
+- History panel for past analyses
 
-Show real API results in the frontend instead of mock data
+### Day 6 — Creator intelligence features
+- **15 edit-type presets** with tailored AI system prompts
+- **Best Cut Generator** — optimal 15s / 30s / 45s windows with confidence scores
+- **Shot Plan** — 5–7 step sequential editing plan per video type
+- **Upgraded voiceover guidance** — `great / okay / risky` safety levels with plain-English reasons
+- **Trending tracks** — live YouTube chart in 8 languages + curated fallback
+- **Track comparison** — compare 2–3 songs and get a ranked fit winner
+- Full frontend integration: preset selector, best cuts panel, shot plan timeline, compare panel, trending section
 
-Add error/loading states for analysis requests
+---
 
-Add SoundCloud metadata support
-
-Add Gemini-based analysis
-
-Implement mic audio input
-
-Build agent pipeline
-
-Vision
-
-BeatMap aims to be a standout AI + full-stack portfolio project demonstrating:
-
-modern frontend architecture
-
-typed backend APIs
-
-multimodal input design
-
-link intelligence pipelines
-
-agent-based AI orchestration
-
-explainable creative AI outputs
-
-License
+## License
 
 MIT
