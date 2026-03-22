@@ -33,9 +33,9 @@ def _build_source_label(url: str) -> str:
 
 
 _FALLBACK_REASONS = {
-    "no_key": "AI scene analysis requires a GEMINI_API_KEY — add it in Secrets to enable full intelligence.",
-    "quota": "Gemini API free-tier quota is exhausted for today. Analysis will resume when the quota resets (daily at midnight Pacific time).",
-    "error": "Gemini AI returned an unexpected error. Metadata was fetched successfully; try again shortly.",
+    "no_key": "AI scene analysis requires an API key — add GROQ_API_KEY or GEMINI_API_KEY in Secrets to enable full intelligence.",
+    "quota": "AI API quota is exhausted for today. Analysis will resume when the quota resets (daily at midnight Pacific time).",
+    "error": "AI returned an unexpected error. Metadata was fetched successfully; try again shortly.",
 }
 
 
