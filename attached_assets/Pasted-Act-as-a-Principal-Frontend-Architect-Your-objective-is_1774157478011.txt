@@ -1,0 +1,121 @@
+Act as a Principal Frontend Architect. Your objective is to engineer a 1:1 functional and structural replica of a specific high-tier Web3 landing page, rebranded as "BeatMap". The stack is strictly HTML5, Tailwind CSS (via CDN), custom CSS for advanced animations, and Vanilla JavaScript. 
+
+Do not use React, Vue, or any external JS libraries other than an optional smooth-scrolling library (like Lenis) if necessary for parallax fidelity. 
+
+Implement the following specifications down to the pixel and millisecond.
+
+### 1. Global CSS Architecture (`styles.css`)
+Define the following custom CSS rules to override standard browser behaviors and implement the brutalist aesthetic:
+
+* **Custom Scrollbar:** Hide the default scrollbar (`::-webkit-scrollbar { display: none; }`).
+* **Typography:** * `@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;700&display=swap');`
+    * `.font-display` = 'Anton', sans-serif (used for all massive headers).
+    * `.font-body` = 'Space Grotesk', sans-serif (used for UI, paragraphs, stats).
+* **Clip-Paths (Crucial for the jagged aesthetic):**
+    * `.clip-slant-right`: `clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);`
+    * `.clip-slant-left`: `clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);`
+    * `.clip-arrow`: `clip-path: polygon(0% 20%, 60% 20%, 60% 0%, 100% 50%, 60% 100%, 60% 80%, 0% 80%);`
+* **Keyframe Animations:**
+    * `@keyframes marquee`: `0% { transform: translateX(0); } 100% { transform: translateX(-50%); }`
+    * `@keyframes spin-slow`: `100% { transform: rotate(360deg); }`
+    * `@keyframes text-glitch`: Create a 20-step keyframe manipulating `clip-path: inset()` and `transform: translate()` with text-shadows in cyan (`#0ff`) and magenta (`#f0f`) to simulate digital distortion.
+    * `@keyframes float`: `0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); }`
+
+### 2. JavaScript Logic (`script.js`)
+Implement strictly typed vanilla JavaScript for the following interactions:
+
+* **Preloader Sequence:** * Target `#loader`. 
+    * `window.addEventListener('load', ...)` triggers a 2500ms `setTimeout`. 
+    * Apply `.opacity-0` and `.pointer-events-none` to `#loader`. 
+    * Target `#skip-btn`. On click, instantly clear the timeout and hide the loader.
+* **Scroll Observers (Reveal Animations):**
+    * Initialize an `IntersectionObserver`. 
+    * Target all elements with class `.reveal-on-scroll`. 
+    * Default state: `opacity: 0; transform: translateY(50px);`.
+    * When `isIntersecting` is true, add a class `.is-revealed` which sets `opacity: 1; transform: translateY(0);` with a `transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1)`.
+* **Sticky Lore Section Sync:**
+    * Track the scroll depth of the `.lore-container`. As the right-side text scrolls, apply a slight parallax Y-translation to the 3D asset in the left sticky column.
+* **FAQ Accordion:**
+    * Select all `.faq-item` buttons. 
+    * On click, toggle the `max-height` of the adjacent `.faq-content` sibling from `0` to its `scrollHeight` in pixels. 
+    * Rotate the `.faq-icon` (`+` to `x`) by toggling a `.rotate-45` class.
+
+### 3. DOM Structure & Tailwind Classes (`index.html`)
+
+**A. Fixed UI (Z-Index: 50)**
+* **Top Nav:** `<nav class="fixed top-0 w-full flex justify-between px-8 py-6 z-50 mix-blend-difference text-white pointer-events-auto">`
+    * Left: `<div class="font-display text-3xl tracking-wider">BEATMAP</div>`
+    * Right: Flex container with 3 social icons (SVG placeholders) hovering to neon green (`hover:text-[#CCFF00]`).
+* **Side Progress:** `<aside class="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col gap-6 z-40 mix-blend-difference">`
+    * Vertical line with 5 dot indicators mapping to sections.
+
+**B. Preloader (`#loader`)**
+* `<div id="loader" class="fixed inset-0 bg-[#0B0C10] z-[100] flex flex-col items-center justify-center transition-opacity duration-700">`
+    * Center: `<h1 class="font-display text-[12vw] text-white glitch-effect">BEATMAP</h1>`
+    * Bottom: `<button id="skip-btn" class="absolute bottom-12 border border-white/30 rounded-full px-6 py-2 text-white font-body text-sm hover:bg-white hover:text-black transition-colors">SKIP</button>`
+
+**C. Hero Section**
+* `<header class="relative w-full h-screen flex items-center justify-center overflow-hidden bg-[#0B0C10]">`
+    * Background: `<div class="absolute inset-0 bg-[url('placeholder-stars.jpg')] opacity-40 bg-cover bg-center parallax-bg"></div>`
+    * Center Typography: `<h1 class="relative z-10 font-display text-[18vw] text-white leading-none uppercase text-shadow-brutal">BEATMAP</h1>` (Ensure `text-shadow-brutal` is defined in CSS as a hard, non-blurred red/cyan drop shadow).
+    * Subtitle: `<p class="absolute bottom-[20%] z-10 font-body text-xl text-white tracking-[0.2em] uppercase">MINT YOUR AVATAR. TAKE A SIDE.</p>`
+    * Play Button: `<div class="absolute bottom-12 right-12 flex items-center gap-4 cursor-pointer group">`
+        * `<div class="w-20 h-20 rounded-full bg-[#CCFF00] flex items-center justify-center group-hover:scale-110 transition-transform"> <span class="text-black font-display text-2xl animate-[spin-slow_10s_linear_infinite]">*</span> </div>`
+        * `<span class="font-display text-6xl text-white">PLAY</span>`
+
+**D. Origins (Lore) Section**
+* `<section class="relative w-full min-h-[150vh] bg-[#0B0C10] flex px-20">`
+    * Left (Sticky 3D Asset): `<div class="w-1/2 h-screen sticky top-0 flex items-center justify-center"> <img src="asset-vending-machine.png" class="w-3/4 animate-[float_6s_ease-in-out_infinite]" /> </div>`
+    * Right (Scrolling Text): `<div class="w-1/2 flex flex-col justify-center gap-32 py-[50vh] text-white font-body text-3xl leading-snug">`
+        * Insert 3 `<p class="reveal-on-scroll">` tags with cyberpunk origin story text. Highlight key terms with `<span class="bg-[#CCFF00] text-black px-2">`.
+
+**E. Factions Grid**
+* `<section class="w-full bg-[#0B0C10] py-20 flex flex-col">`
+    * `<h2 class="font-display text-[10vw] text-white text-center uppercase mb-12">PICK YOUR FACTION</h2>`
+    * `<div class="w-full h-[70vh] flex">`
+        * **Faction 1:** `<div class="flex-1 bg-[#FF003C] clip-slant-right relative group cursor-pointer transition-all duration-500 hover:flex-[1.2] overflow-hidden">`
+            * Image: `<img src="faction1.png" class="absolute bottom-0 left-1/2 -translate-x-1/2 h-[90%] object-cover group-hover:scale-105 transition-transform" />`
+            * Hover CTA: `<div class="absolute bottom-10 left-1/2 -translate-x-1/2 translate-y-20 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all bg-black text-white px-8 py-3 rounded-full font-body font-bold flex gap-2"><span class="text-[#CCFF00]">☺</span> LEARN MORE</div>`
+        * **Faction 2:** `<div class="flex-1 bg-[#1F2833] relative group cursor-pointer transition-all duration-500 hover:flex-[1.2] overflow-hidden">` (Repeat internal structure).
+        * **Faction 3:** `<div class="flex-1 bg-[#FF007F] clip-slant-left relative group cursor-pointer transition-all duration-500 hover:flex-[1.2] overflow-hidden">` (Repeat internal structure).
+
+**F. Customization (Marquee & Grid)**
+* `<section class="w-full bg-[#0B0C10] py-20">`
+    * `<h2 class="font-display text-7xl text-white text-center mb-8">CUSTOMIZE YOUR NODE</h2>`
+    * Marquee: `<div class="w-full bg-[#FF007F] text-black font-display text-3xl py-3 overflow-hidden flex whitespace-nowrap"> <div class="animate-[marquee_15s_linear_infinite] shrink-0 w-[200%] flex justify-around"> <span>ITEM OF THE DAY</span><span>TACTICAL GEAR</span><span>NEW DROP</span><span>ITEM OF THE DAY</span><span>TACTICAL GEAR</span><span>NEW DROP</span> </div> </div>`
+    * Grid: `<div class="grid grid-cols-4 gap-6 px-20 py-16">`
+        * Item Card: `<div class="bg-[#1F2833] p-4 border-2 border-transparent hover:border-[#66FCF1] transition-colors cursor-pointer group">`
+            * `<div class="w-full aspect-square bg-[#0B0C10] mb-4 flex items-center justify-center"> <img src="item1.png" class="w-2/3 group-hover:-translate-y-2 transition-transform" /> </div>`
+            * `<h3 class="text-white font-display text-xl tracking-wide">NEON JACKET</h3>`
+            * `<div class="flex justify-between mt-2 font-body text-sm"> <span class="bg-[#CCFF00] text-black px-2 py-1 font-bold">RARE</span> <span class="text-gray-400">0.05 ETH</span> </div>`
+
+**G. Team Section**
+* `<section class="w-full bg-[#FF007F] py-32 px-20">`
+    * Grid: `<div class="grid grid-cols-3 gap-10">`
+        * Team Card: `<div class="bg-black text-white p-6 shadow-[10px_10px_0px_rgba(0,0,0,0.5)] border border-gray-800">`
+            * `<img src="team1.png" class="w-full aspect-square object-cover mb-6 filter grayscale group-hover:grayscale-0" />`
+            * `<h3 class="font-display text-4xl">CYBER_LEAD</h3>`
+            * `<p class="text-[#CCFF00] font-body text-sm mb-4">LEAD DEVELOPER</p>`
+            * `<p class="font-body text-gray-400 text-sm mb-6 leading-relaxed">Architect of the BeatMap protocol.</p>`
+            * Social: `<svg class="w-6 h-6 fill-white hover:fill-[#1DA1F2] cursor-pointer">...</svg>`
+
+**H. FAQ & Footer**
+* `<section class="w-full bg-[#0B0C10] py-32 px-20 flex flex-col items-center">`
+    * `<h2 class="font-display text-[15vw] text-white/10 absolute select-none pointer-events-none">FAQ</h2>`
+    * Accordion Container: `<div class="w-full max-w-4xl z-10 mt-20">`
+        * Item: `<div class="border-b border-gray-800 faq-item">`
+            * `<button class="w-full py-8 flex justify-between items-center text-left text-white font-display text-3xl hover:text-[#66FCF1] transition-colors"> WHAT IS BEATMAP? <span class="faq-icon text-4xl transition-transform duration-300">+</span> </button>`
+            * `<div class="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out"> <p class="font-body text-gray-400 pb-8 text-lg">BeatMap is a next-generation protocol...</p> </div>`
+* Footer: `<footer class="w-full bg-[#CCFF00] mt-32 pt-20 pb-10 flex flex-col items-center clip-slant-right">`
+    * `<h2 class="font-display text-[12vw] text-black leading-none text-center hover:scale-105 transition-transform cursor-pointer">JOIN DISCORD</h2>`
+    * `<div class="mt-20 flex gap-8 font-body text-black font-bold text-sm uppercase"> <a>Twitter</a> <a>Terms</a> <a>Contract</a> </div>`
+
+---
+
+### Image Generation Prompts
+Use these exact prompts in an AI image generator (Midjourney v6 or DALL-E 3) to create the necessary placeholder assets:
+
+1.  **Lore Section (Vending Machine Placeholder):** `A 3D isometric render of a futuristic, cyberpunk vending machine glowing with neon pink and cyan lights, dispensing glowing spray paint cans. Dark grey background, brutalist design, highly detailed, octane render, 8k.`
+2.  **Factions Section (Character 1):** `A 3D character portrait of a cyberpunk street samurai wearing a glowing demon mask and tactical streetwear. Acid green and black color palette. Front facing, waist up, studio lighting, transparent background style, 3d clay render style.`
+3.  **Factions Section (Character 2):** `A 3D character portrait of a futuristic android with chrome plating and a high-tech visor, wearing an oversized puffer jacket. Magenta and dark grey color palette. Front facing, waist up, studio lighting, 3d clay render style.`
+4.  **Gear Section (Item):** `A 3D render of a futuristic anti-gravity hoverboard with neon yellow grip tape and glowing thrusters. Floating, isolated object, studio lighting, dark background, highly detailed.`
