@@ -5,9 +5,12 @@ import type { SongAnalysisResult } from "@/types/analysis";
 import { analyzeAudio, analyzeSongLink, fetchAnalysisById } from "@/lib/api";
 import { AnalysisResult } from "@/components/analysis-result";
 import { EmptyState } from "@/components/empty-state";
+import { HeroBackground } from "@/components/hero-background";
 import { LinkInputForm } from "@/components/link-input-form";
+import { MarqueeStrip } from "@/components/marquee-strip";
 import { RecentAnalyses } from "@/components/recent-analyses";
 import { Recorder } from "@/components/recorder";
+import { ScrollingCards } from "@/components/scrolling-cards";
 import { SectionHeader } from "@/components/section-header";
 
 type Tab = "link" | "mic" | "history";
@@ -84,85 +87,101 @@ export default function Home() {
     { id: "history", label: "History" },
   ];
 
+  const showScrollingCards = !loading && !error && !result && tab !== "history";
+
   return (
     <main className="min-h-screen text-white">
-      <section className="mx-auto max-w-7xl px-6 py-14 sm:px-8 sm:py-20">
-        <SectionHeader
-          eyebrow="BeatMap"
-          title="Turn any song into scene-fit intelligence"
-          description="Paste a song link or record live audio to generate timestamped mood shifts, hook windows, voiceover-safe sections, and creative use-case insights."
-        />
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden">
+        <HeroBackground />
+        <div className="relative mx-auto max-w-7xl px-6 pb-10 pt-16 sm:px-8 sm:pt-24">
+          <SectionHeader
+            eyebrow="BeatMap"
+            title="Turn any song into scene-fit intelligence"
+            description="Paste a song link or record live audio to generate timestamped mood shifts, hook windows, voiceover-safe sections, and creative use-case insights."
+          />
 
-        <div className="mt-12">
-          <div className="mb-6 flex gap-2 rounded-2xl border border-white/8 bg-white/[0.04] p-1.5 sm:inline-flex">
-            {tabs.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => setTab(id)}
-                className={`flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-bold transition-all ${
-                  tab === id
-                    ? TAB_STYLES[id].active
-                    : "border-transparent text-white/35 hover:text-white/60"
-                }`}
-              >
-                <span>{TAB_STYLES[id].icon}</span>
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {tab === "link" && (
-            <div className="mb-8">
-              <LinkInputForm onSubmit={handleLinkSubmit} loading={loading} />
+          <div className="mt-12">
+            <div className="mb-6 flex gap-2 rounded-2xl border border-white/8 bg-white/[0.04] p-1.5 sm:inline-flex">
+              {tabs.map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  className={`flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-bold transition-all ${
+                    tab === id
+                      ? TAB_STYLES[id].active
+                      : "border-transparent text-white/35 hover:text-white/60"
+                  }`}
+                >
+                  <span>{TAB_STYLES[id].icon}</span>
+                  {label}
+                </button>
+              ))}
             </div>
-          )}
 
-          {tab === "mic" && !loading && (
-            <div className="mb-8 rounded-3xl border border-purple-500/20 bg-purple-500/5 p-6">
-              <p className="mb-4 text-sm text-white/45">
-                Record audio directly from your microphone for AI scene analysis.
-              </p>
-              <Recorder onAudioReady={handleAudioReady} loading={loading} />
-            </div>
-          )}
-
-          {tab === "history" && (
-            <div className="mb-8">
-              <h2 className="font-display mb-4 text-sm font-bold uppercase tracking-widest text-amber-300/70">
-                Recent analyses
-              </h2>
-              <RecentAnalyses onOpen={handleOpenHistory} refreshKey={historyRefreshKey} />
-            </div>
-          )}
-
-          {loading && (
-            <div className="mb-8 flex flex-col items-center gap-5 py-16">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full animate-pulse-ring opacity-40"
-                  style={{ background: "linear-gradient(135deg, #f97316, #ec4899)" }} />
-                <div className="relative h-12 w-12 animate-spin rounded-full border-2 border-transparent"
-                  style={{ borderTopColor: "#f97316", borderRightColor: "#ec4899" }} />
+            {tab === "link" && (
+              <div className="mb-8">
+                <LinkInputForm onSubmit={handleLinkSubmit} loading={loading} />
               </div>
-              <p className="text-sm font-medium text-white/40">
-                Analysing{tab === "mic" ? " your recording" : ""}…
-              </p>
-            </div>
-          )}
+            )}
 
-          {error && !loading && (
-            <div className="mb-8 rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4">
-              <p className="text-sm font-semibold text-red-300">{error}</p>
-              <p className="mt-1 text-xs text-red-400/60">
-                Check that the backend is running and the link is a valid YouTube or SoundCloud URL.
-              </p>
-            </div>
-          )}
+            {tab === "mic" && !loading && (
+              <div className="mb-8 rounded-3xl border border-purple-500/20 bg-purple-500/5 p-6">
+                <p className="mb-4 text-sm text-white/45">
+                  Record audio directly from your microphone for AI scene analysis.
+                </p>
+                <Recorder onAudioReady={handleAudioReady} loading={loading} />
+              </div>
+            )}
 
-          {!loading && !error && result && <AnalysisResult result={result} />}
+            {tab === "history" && (
+              <div className="mb-8">
+                <h2 className="font-display mb-4 text-sm font-bold uppercase tracking-widest text-amber-300/70">
+                  Recent analyses
+                </h2>
+                <RecentAnalyses onOpen={handleOpenHistory} refreshKey={historyRefreshKey} />
+              </div>
+            )}
 
-          {!loading && !error && !result && tab !== "history" && <EmptyState />}
+            {loading && (
+              <div className="mb-8 flex flex-col items-center gap-5 py-16">
+                <div className="relative">
+                  <div
+                    className="absolute inset-0 rounded-full animate-pulse-ring opacity-40"
+                    style={{ background: "linear-gradient(135deg, #f97316, #ec4899)" }}
+                  />
+                  <div
+                    className="relative h-12 w-12 animate-spin rounded-full border-2 border-transparent"
+                    style={{ borderTopColor: "#f97316", borderRightColor: "#ec4899" }}
+                  />
+                </div>
+                <p className="text-sm font-medium text-white/40">
+                  Analysing{tab === "mic" ? " your recording" : ""}…
+                </p>
+              </div>
+            )}
+
+            {error && !loading && (
+              <div className="mb-8 rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4">
+                <p className="text-sm font-semibold text-red-300">{error}</p>
+                <p className="mt-1 text-xs text-red-400/60">
+                  Check that the backend is running and the link is a valid YouTube or SoundCloud URL.
+                </p>
+              </div>
+            )}
+
+            {!loading && !error && result && <AnalysisResult result={result} />}
+
+            {!loading && !error && !result && tab !== "history" && <EmptyState />}
+          </div>
         </div>
       </section>
+
+      {/* ── Marquee strip (always visible) ── */}
+      <MarqueeStrip />
+
+      {/* ── Scrolling card showcase (only on empty state) ── */}
+      {showScrollingCards && <ScrollingCards />}
     </main>
   );
 }
